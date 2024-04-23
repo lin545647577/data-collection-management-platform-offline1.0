@@ -1,0 +1,10 @@
+@import './base.css';
+
+#app {
+  /*解决浏览器输入框在记住密码后改变颜色问题*/
+  input:-webkit-autofill {
+    /* 自动填充文字颜色 */
+    /* -webkit-text-fill-color: #24515d !important; */
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
