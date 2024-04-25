@@ -18,30 +18,13 @@
       router
       :popper-offset="15"
     >
-      <template v-for="item in list" :key="item.menuId">
-        <el-sub-menu :index="item.path" v-if="item.children">
-          <template #title>
-            <svg class="svg-menu">
-              <!-- xlink:href执行用哪一个图标,属性值务必#icon-图标名字 -->
-              <use :xlink:href="item.icon"></use>
-            </svg>
-            <span>{{ item.menuName }}</span>
-          </template>
-          <el-menu-item
-            v-for="subItem in item.children"
-            :key="subItem.menuId"
-            :index="subItem.path"
-            >{{ subItem.menuName }}</el-menu-item
-          >
-        </el-sub-menu>
-        <el-menu-item :index="item.path" v-else>
-          <svg class="svg-menu">
-            <!-- xlink:href执行用哪一个图标,属性值务必#icon-图标名字 -->
-            <use :xlink:href="item.icon"></use>
-          </svg>
-          <span>{{ item.menuName }}</span>
-        </el-menu-item>
-      </template>
+      <el-menu-item v-for="item in list" :key="item.menuId" :index="item.path">
+        <svg class="svg-menu">
+          <!-- xlink:href执行用哪一个图标,属性值务必#icon-图标名字 -->
+          <use :xlink:href="item.icon"></use>
+        </svg>
+        <span>{{ item.menuName }}</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
@@ -78,60 +61,7 @@ const list = [
     menuName: '参数设置',
     icon: '#icon-menu-setting',
     path: '/data-collection/setting',
-  },
-  {
-    menuId: 48,
-    menuName: '库存管理',
-    menuCode: 'operations-stock-control',
-    icon: 'menu-2',
-    path: '#',
-    children: [
-      {
-        menuId: 51,
-        menuName: '领用申请',
-        menuCode: 'operations-use-apply',
-        icon: 'layui-icon-star-fill',
-        path: '/operations/use-apply',
-        sort: 0,
-        parentId: 48,
-        app: 5,
-        children: null,
-      },
-      {
-        menuId: 49,
-        menuName: '配件库存',
-        menuCode: 'operations-parts-stock',
-        icon: 'layui-icon-star-fill',
-        path: '/operations/parts-stock',
-        sort: 0,
-        parentId: 48,
-        app: 5,
-        children: null,
-      },
-      {
-        menuId: 50,
-        menuName: '库存预警',
-        menuCode: 'operations-parts-stock-warn',
-        icon: 'layui-icon-star-fill',
-        path: '/operations/parts-stock-warn',
-        sort: 0,
-        parentId: 48,
-        app: 5,
-        children: null,
-      },
-      {
-        menuId: 52,
-        menuName: '领用审批',
-        menuCode: 'operations-use-approval',
-        icon: 'layui-icon-star-fill',
-        path: '/operations/use-approval',
-        sort: 0,
-        parentId: 48,
-        app: 5,
-        children: null,
-      },
-    ],
-  },
+  }
 ]
 const handleOpen = (key, keyPath) => {
   console.log(key, keyPath)
@@ -148,7 +78,7 @@ const handleClose = (key, keyPath) => {
   padding: 15px 0;
   color: var(--vt-c-white);
   .logo {
-    padding: 0 16px 15px 16px;
+    padding: 0 15px 15px 15px;
     .svg-logo {
       width: 32px;
       height: 26.5px;

@@ -6,6 +6,9 @@
   --dc-theme-blue: #0070B8; /*数据采集主要蓝色色号*/
   --color-background: var(--vt-c-white);
   --color-text: var(--vt-c-text-light);
+  --dc-font-size:14px;
+  --el-font-size-base:14px !important;
+  --el-color-primary:#0070B8 !important;
 }
 
 *,
@@ -42,4 +45,10 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollable {
+      overflow-y: scroll; /* 对于垂直滚动 */
+  }
 }

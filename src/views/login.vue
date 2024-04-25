@@ -85,7 +85,7 @@ const submitForm = async (formEl) => {
       try {
         const res = await login(ruleForm)
         console.log(res.payload);
-        setAuthToken(res.payload.accessToken)
+        setAuthToken(res.payload)
         loading.value=false
         router.push('/')
       } catch (error) {
