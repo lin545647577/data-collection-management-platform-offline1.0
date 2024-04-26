@@ -1,12 +1,12 @@
 <template>
   <div class="head-box">
-    <span>2022-07-10 14:22:10</span>
+    <span>{{ sysTime }}</span>
     <span>
       <svg class="svg-header">
         <!-- xlink:href执行用哪一个图标,属性值务必#icon-图标名字 -->
         <use xlink:href="#icon-header"></use>
       </svg>
-      <span>G3501</span>
+      <span>{{stationName}}</span>
     </span>
     <span>持续运行12天2小时34分</span>
     <el-dropdown>
@@ -18,7 +18,7 @@
       </span>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item :disabled="loading" class="btn-menu" @click="handleLogout">退出</el-dropdown-item>
+          <el-dropdown-item :disabled="isDisabled" class="btn-menu" @click="handleLogout">退出</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -26,23 +26,65 @@
 </template>
 <script setup>
 import { ArrowDown } from '@element-plus/icons-vue'
-import { ref, reactive } from 'vue'
+import { ref,onBeforeMount, onBeforeUnmount,watch } from 'vue'
 import { logout } from '@/api/login'
+import {querySysTime,queryStation} from '@/api/setting'
 import { removeAuthToken } from '@/cookie/auth'
 import { useRouter } from 'vue-router'
+import moment from 'moment'
+import { useStationStore } from '@/stores/station'
+const stationStore =useStationStore()
 const router = useRouter()
-const loading=ref(false);
+const isDisabled=ref(false);
 const handleLogout = async() => {
-  loading.value=true;
+  isDisabled.value=true;
   try {
     const res = await logout()
     removeAuthToken()
-    loading.value=false;
+    isDisabled.value=false;
     router.push('/data-collection/login')
   } catch (error) {
-    loading.value=false;
+    isDisabled.value=false;
   }
 }
+const stationName=ref('')
+const queryStationName=()=>{
+  queryStation().then(res=>{
+    stationName.value=res.payload
+    stationStore.setStation(res.payload)
+  })
+}
+
+const sysTime=ref('')
+let timer=null
+const getTime=()=>{
+  querySysTime().then(res=>{
+    sysTime.value=moment(res.payload).format('yyyy-MM-DD hh:mm:ss')
+    stationStore.setTime(res.payload)
+    setTimer()
+  })
+}
+const setTimer=()=>{
+  timer=setInterval(() => {
+    sysTime.value= moment(sysTime.value).add(1,'second').format('yyyy-MM-DD hh:mm:ss')
+  }, 1000);
+}
+watch(
+  [()=>stationStore.station,()=>stationStore.time],
+  ([station,time])=>{
+    stationName.value=station
+    sysTime.value=time
+  }
+)
+
+onBeforeMount(()=>{
+  getTime();
+  queryStationName();
+})
+onBeforeUnmount(()=>{
+  clearInterval(timer)
+  // sysTime.value=''
+})
 </script>
 <style scoped lang="less">
 .head-box {

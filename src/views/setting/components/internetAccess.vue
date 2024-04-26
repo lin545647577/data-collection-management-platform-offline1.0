@@ -3,7 +3,6 @@
     ref="ruleFormRef"
     :model="form"
     :rules="rules"
-    label-width="auto"
     class="demo-ruleForm"
     label-position="left"
   >
@@ -105,6 +104,11 @@ const submitForm = async (formEl) => {
   }
   :deep(.el-form-item){
     margin-bottom: 22px;
+    & .el-form-item__label{
+      height: 32px;
+      width: 120px;
+      line-height: 32px;
+    }
     & .el-input__inner{
       font-size: var(--dc-font-size);
       height: 32px;

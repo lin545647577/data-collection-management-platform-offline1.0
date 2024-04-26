@@ -1,9 +1,9 @@
 <template>
   <el-form
+    v-if="form"
     ref="ruleFormRef"
     :model="form"
     :rules="rules"
-    label-width="auto"
     class="demo-ruleForm"
     label-position="left"
   >
@@ -78,6 +78,11 @@ const submitForm = async (formEl) => {
         height: 32px;
         line-height: 32px;
       }
+    }
+    & .el-form-item__label{
+      height: 32px;
+      width: 140px;
+      line-height: 32px;
     }
     &:last-of-type{
       margin-bottom: 0;

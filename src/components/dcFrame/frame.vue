@@ -6,7 +6,7 @@
       </el-aside>
       <el-container>
         <el-header>
-          <Header />
+          <Header/>
         </el-header>
         <el-main class="main-bg">
           <RouterView />

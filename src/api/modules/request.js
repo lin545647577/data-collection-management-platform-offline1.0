@@ -4,8 +4,10 @@
 
 import axios from 'axios'
 import { ElMessage  } from 'element-plus'
-import { getAuthToken, removeAuthToken } from "@/cookie/auth";
+import { getAuthToken } from "@/cookie/auth";
 import { blobToText } from '@/utils/util.js'
+import { useUserInfoStore } from '@/stores/user';
+const {removeUserInfo}=useUserInfoStore()
 
 let timer = null
 
@@ -28,6 +30,7 @@ const err = (err) => {
         break
       case 401:
         err.message = '未授权，请重新登录'
+        err.toDo=removeUserInfo
         break
       case 403:
         err.message = '拒绝访问'
@@ -66,9 +69,13 @@ const err = (err) => {
       code: err.response.status,
       message: err.message
     }
+    
     // 统一错误处理可以放这，例如页面提示错误...
-    console.log('统一错误处理: ', errData)
+    console.log('统一错误处理: ', errData,err)
     ElMessage.error(err.message || 'Error')
+    err.toDo && setTimeout(() => {
+      err.toDo()
+    }, 1000);
   }
 
   return Promise.reject(err)
@@ -109,15 +116,18 @@ request.interceptors.response.use(async (response) => {
   } else {
     if (code === 401) {
       // 登录状态失效
-      setTimeout(() => {
-        // store.dispatch('user/clearLocalCache')
-        removeAuthToken();
-      }, 1000)
+      debounce(() => {
+        ElMessage.error('登录超时，请重新登录')
+        setTimeout(() => {
+          // store.dispatch('user/clearLocalCache')
+          // removeUserInfo()
+        }, 1000)
+      })()
+    }else{
+      debounce(() => {
+        ElMessage.error(message || 'Error')
+      })()
     }
-    debounce(() => {
-      ElMessage.error(message || 'Error')
-    })()
-
     return Promise.reject(new Error(message || 'Error'))
   }
 }, err)

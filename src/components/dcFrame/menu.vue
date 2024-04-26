@@ -14,9 +14,9 @@
       text-color="#ffffff"
       active-text-color="#ffffff"
       @open="handleOpen"
-      @close="handleClose"
       router
       :popper-offset="15"
+      unique-opened	
     >
       <el-menu-item v-for="item in list" :key="item.menuId" :index="item.path">
         <svg class="svg-menu">
@@ -29,8 +29,10 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive } from 'vue'
-const activeIndex = ref('1')
+import { ref,onBeforeMount } from 'vue'
+import { useMenuStore } from '@/stores/menu';
+const { activeMenu,setActiveMenu }=useMenuStore();
+const activeIndex = ref('/data-collection/index')
 const list = [
   {
     menuId: '1',
@@ -63,11 +65,16 @@ const list = [
     path: '/data-collection/setting',
   }
 ]
+onBeforeMount(()=>{
+  if(activeMenu) activeIndex.value=activeMenu
+  // console.log({
+  //   activeIndex:activeIndex.value,
+  //   activeMenu:activeMenu
+  // });
+})
 const handleOpen = (key, keyPath) => {
-  console.log(key, keyPath)
-}
-const handleClose = (key, keyPath) => {
-  console.log(key, keyPath)
+  // console.log(key, keyPath)
+  setActiveMenu(key)
 }
 </script>
 <style scoped lang="less">

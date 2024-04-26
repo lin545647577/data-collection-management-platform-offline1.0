@@ -15,7 +15,9 @@ export default ({command,mode})=> {
   //   env:env
   // })
   return defineConfig({
-    productionSourceMap:false,
+    build: {
+      productionSourceMap:false, // 或者使用 'inline' 等其他选项
+    },
     server:{
       host: '0.0.0.0', // 主机ip
       https: false, // 是否开启 https
@@ -27,10 +29,7 @@ export default ({command,mode})=> {
           target: env.VITE_BASE_URL, // 后台接口前缀
           changeOrigin: true, // 是否允许跨域
           secure: false, // 如果是https接口，需要配置这个参数
-          rewrite: (path) => {
-            console.log(path.replace(/^\/v1-api/, ""),path);
-            return path.replace(/^\/v1-api/, "")
-          },
+          rewrite: (path) => path.replace(/^\/v1-api/, ""),
           // bypass(req, res, options) {
           //   const proxyURL = options.target + options.rewrite(req.url);
           //   console.log('proxyURL', proxyURL);
