@@ -8,12 +8,12 @@ export const useUserInfoStore = defineStore('user', () => {
   const router=useRouter()
   // console.log('sessionStorage:user:',sessionStorage.getItem('username'));
   const username = ref('')
-  if(sessionStorage.getItem('username')){
-    console.log(sessionStorage.getItem('username'));
-    username.value=sessionStorage.getItem('username')
+  if(localStorage.getItem('username')){
+    console.log(localStorage.getItem('username'));
+    username.value=localStorage.getItem('username')
   }
   const setUserInfo=(val)=>{
-    sessionStorage.setItem('username',val)
+    localStorage.setItem('username',val)
     username.value=val
   }
   const removeUserInfo=()=>{

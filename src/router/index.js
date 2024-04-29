@@ -60,7 +60,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   Nprogress.start()
   if(to.name=='login' && getAuthToken()){
-    router.go(-1)
+    router.push('/data-collection/index')
     return
   }
   next()
