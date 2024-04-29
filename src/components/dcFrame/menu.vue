@@ -29,9 +29,9 @@
   </div>
 </template>
 <script setup>
-import { ref,onBeforeMount } from 'vue'
+import { ref,onBeforeMount,watch } from 'vue'
 import { useMenuStore } from '@/stores/menu';
-const { activeMenu,setActiveMenu }=useMenuStore();
+const menuStore=useMenuStore();
 const activeIndex = ref('/data-collection/index')
 const list = [
   {
@@ -66,15 +66,17 @@ const list = [
   }
 ]
 onBeforeMount(()=>{
-  if(activeMenu) activeIndex.value=activeMenu
-  // console.log({
-  //   activeIndex:activeIndex.value,
-  //   activeMenu:activeMenu
-  // });
+  if(menuStore.activeMenu) activeIndex.value=menuStore.activeMenu
 })
+watch(
+  ()=>menuStore.activeMenu,
+  (activeMenu)=>{
+    activeIndex.value=activeMenu
+  }
+)
 const handleOpen = (key, keyPath) => {
   // console.log(key, keyPath)
-  setActiveMenu(key)
+  menuStore.setActiveMenu(key)
 }
 </script>
 <style scoped lang="less">

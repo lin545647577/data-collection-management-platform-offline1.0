@@ -11,7 +11,7 @@
     <span>持续运行12天2小时34分</span>
     <el-dropdown>
       <span class="el-dropdown-link">
-        张晓晓
+        {{username}}
         <el-icon class="el-icon--right">
           <arrow-down />
         </el-icon>
@@ -32,6 +32,8 @@ import {querySysTime,queryStation} from '@/api/setting'
 import { removeAuthToken } from '@/cookie/auth'
 import { useRouter } from 'vue-router'
 import moment from 'moment'
+import { useUserInfoStore } from '@/stores/user'
+const {username} = useUserInfoStore()
 import { useStationStore } from '@/stores/station'
 const stationStore =useStationStore()
 const router = useRouter()

@@ -63,7 +63,7 @@
       }">
         <el-time-picker
           v-model="form.date2"
-          placeholder=""
+          placeholder="请选择时间"
           style="width: 100%"
           value-format="HH:mm:ss"
         />

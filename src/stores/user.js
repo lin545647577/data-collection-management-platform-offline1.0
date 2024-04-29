@@ -1,4 +1,4 @@
-import { ref,reactive } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { removeAuthToken } from "@/cookie/auth";
 import { useRouter } from 'vue-router';
@@ -6,22 +6,21 @@ import {useMenuStore} from './menu'
 export const useUserInfoStore = defineStore('user', () => {
   const {setActiveMenu}=useMenuStore()
   const router=useRouter()
-  console.log('sessionStorage:user:',sessionStorage.getItem('usrInfo'));
-  let userInfo = {}
-  if(sessionStorage.getItem('usrInfo')){
-    userInfo=reactive(sessionStorage.getItem('usrInfo'))
-  }else{
-    // 查询用户信息
+  // console.log('sessionStorage:user:',sessionStorage.getItem('username'));
+  const username = ref('')
+  if(sessionStorage.getItem('username')){
+    console.log(sessionStorage.getItem('username'));
+    username.value=sessionStorage.getItem('username')
   }
-  // 查询用户信息
-  const queryUserInfo=()=>{
-
+  const setUserInfo=(val)=>{
+    sessionStorage.setItem('username',val)
+    username.value=val
   }
   const removeUserInfo=()=>{
-    userInfo={};
+    setUserInfo('')
     removeAuthToken()
     setActiveMenu('')//重置选中菜单
     router.push('/data-collection/login')
   }
-  return { userInfo,removeUserInfo }
+  return { username,removeUserInfo,setUserInfo }
 })

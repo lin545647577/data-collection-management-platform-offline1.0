@@ -105,7 +105,7 @@ const submitForm = async (formEl) => {
     if (valid) {
       // console.log('submit!',state.form)
       updateThreshold(state.form).then(res=>{
-        ElMessage.success('保存时间成功')
+        ElMessage.success('保存成功')
       })
     } else {
       console.log('error submit!', fields)

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getAuthToken } from "@/cookie/auth";
 //导入Nprogress
 import Nprogress from 'nprogress'
 //导入nprogress的样式
@@ -47,6 +48,10 @@ const router = createRouter({
     {
       path:'/',
       redirect:'/data-collection/index'
+    },
+    {
+      path:'/:pathMatch(.*)*', // 匹配不存在的路由地址
+      redirect:'/data-collection/index'
     }
   ]
 })
@@ -54,6 +59,10 @@ const router = createRouter({
 //定义路由导航前置守卫
 router.beforeEach((to, from, next) => {
   Nprogress.start()
+  if(to.name=='login' && getAuthToken()){
+    router.go(-1)
+    return
+  }
   next()
 })
  

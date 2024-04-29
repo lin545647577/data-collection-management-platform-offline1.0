@@ -55,14 +55,13 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onBeforeMount } from 'vue'
+import { ref, reactive } from 'vue'
 import {login} from "@/api/login.js"
-import {setAuthToken,getAuthToken} from '@/cookie/auth'
+import {setAuthToken} from '@/cookie/auth'
 import { useRouter } from 'vue-router';
+import {useUserInfoStore} from '@/stores/user'
+const {setUserInfo}=useUserInfoStore()
 const router=useRouter()
-onBeforeMount(()=>{
-  if(getAuthToken()) router.push('/')
-})
 
 const ruleForm = reactive({
   username: '',
@@ -87,6 +86,7 @@ const submitForm = async (formEl) => {
         const res = await login(ruleForm)
         setAuthToken(res.payload)
         loading.value=false
+        setUserInfo(ruleForm.username)
         router.push('/')
       } catch (error) {
         loading.value=false
