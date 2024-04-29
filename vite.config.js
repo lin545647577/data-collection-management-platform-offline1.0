@@ -17,6 +17,8 @@ export default ({command,mode})=> {
   return defineConfig({
     build: {
       productionSourceMap:false, // 或者使用 'inline' 等其他选项
+      outDir: 'dist', //指定输出路径
+      emptyOutDir: true, //默认情况下，若 outDir 在 root 目录下，则 Vite 会在构建时清空该目录。
     },
     server:{
       host: '0.0.0.0', // 主机ip

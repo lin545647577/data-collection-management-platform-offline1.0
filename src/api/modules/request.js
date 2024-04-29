@@ -72,10 +72,12 @@ const err = (err) => {
     
     // 统一错误处理可以放这，例如页面提示错误...
     console.log('统一错误处理: ', errData,err)
-    ElMessage.error(err.message || 'Error')
-    err.toDo && setTimeout(() => {
-      err.toDo()
-    }, 1000);
+    debounce(() => {
+      ElMessage.error(err.message || 'Error')
+      err.toDo && setTimeout(() => {
+        err.toDo()
+      }, 1000);
+    })()
   }
 
   return Promise.reject(err)

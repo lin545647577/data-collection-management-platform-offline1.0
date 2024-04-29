@@ -59,14 +59,14 @@ const sysTime=ref('')
 let timer=null
 const getTime=()=>{
   querySysTime().then(res=>{
-    sysTime.value=moment(res.payload).format('yyyy-MM-DD hh:mm:ss')
+    sysTime.value=moment(res.payload).format('yyyy-MM-DD HH:mm:ss')
     stationStore.setTime(res.payload)
     setTimer()
   })
 }
 const setTimer=()=>{
   timer=setInterval(() => {
-    sysTime.value= moment(sysTime.value).add(1,'second').format('yyyy-MM-DD hh:mm:ss')
+    sysTime.value= moment(sysTime.value).add(1,'second').format('yyyy-MM-DD HH:mm:ss')
   }, 1000);
 }
 watch(

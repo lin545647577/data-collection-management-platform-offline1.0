@@ -9,6 +9,7 @@
   --dc-font-size:14px;
   --el-font-size-base:14px !important;
   --el-color-primary:#0070B8 !important;
+  --el-text-color-regular:var(--vt-c-indigo) !important;
 }
 
 *,

@@ -1,39 +1,38 @@
 <template>
   <el-form
     ref="ruleFormRef"
-    :model="form"
-    :rules="rules"
+    :model="state"
     class="demo-ruleForm"
     label-position="left"
   >
     <div class="title">SIM1</div>
     <div class="form-item-box">
       <el-form-item label="指定接入点：">
-        <el-switch v-model="form.point1"/>
+        <el-switch v-model="state.form1.apnPoint" @change="changeBtn({val:state.form1.apnPoint,form:'form1',key:'apn'})"/>
       </el-form-item>
-      <el-form-item label="接入点名称：" prop="pointName1">
-        <el-input v-model="form.pointName1" :disabled="!form.point1"/>
+      <el-form-item label="接入点名称：" prop="form1.apn" :rules="setRule(state.form1.apnPoint,'接入点名称')">
+        <el-input v-model="state.form1.apn" :disabled="!state.form1.apnPoint"/>
       </el-form-item>
       <el-form-item label="指定接口：">
-        <el-switch v-model="form.interface1"/>
+        <el-switch v-model="state.form1.interfaceBtn" @change="changeBtn({val:state.form1.interfaceBtn,form:'form1',key:'interfac'})"/>
       </el-form-item>
-      <el-form-item label="接口名称：" prop="name1">
-        <el-input v-model="form.name1" :disabled="!form.interface1"/>
+      <el-form-item label="接口名称：" prop="form1.interfac" :rules="setRule(state.form1.interfaceBtn,'接口名称')">
+        <el-input v-model="state.form1.interfac" :disabled="!state.form1.interfaceBtn"/>
       </el-form-item>
     </div>
     <div class="title">SIM2</div>
     <div class="form-item-box">
       <el-form-item label="指定接入点：">
-        <el-switch v-model="form.point2" />
+        <el-switch v-model="state.form2.apnPoint" @change="changeBtn({val:state.form2.apnPoint,form:'form2',key:'apn'})"/>
       </el-form-item>
-      <el-form-item label="接入点名称：" prop="pointName2">
-        <el-input v-model="form.pointName2" :disabled="!form.point2"/>
+      <el-form-item label="接入点名称：" prop="form2.apn" :rules="setRule(state.form2.apnPoint,'接入点名称')">
+        <el-input v-model="state.form2.apn" :disabled="!state.form2.apnPoint"/>
       </el-form-item>
-      <el-form-item label="指定接入点：">
-        <el-switch v-model="form.interface2" />
+      <el-form-item label="指定接口：">
+        <el-switch v-model="state.form2.interfaceBtn" @change="changeBtn({val:state.form2.interfaceBtn,form:'form2',key:'interfac'})"/>
       </el-form-item>
-      <el-form-item label="接入点名称：" prop="name2">
-        <el-input v-model="form.name2" :disabled="!form.interface2"/>
+      <el-form-item label="接口名称：" prop="form2.interfac" :rules="setRule(state.form2.interfaceBtn,'接口名称')">
+        <el-input v-model="state.form2.interfac" :disabled="!state.form2.interfaceBtn"/>
       </el-form-item>
     </div>
     <el-form-item>
@@ -44,42 +43,67 @@
   </el-form>
 </template>
 <script setup>
-import { ref, reactive } from 'vue'
-const form =reactive({
-  pointName1:'',
-  pointName2:'',
-  name1:'',
-  name2:'',
-  interface1:true,
-  interface2:true,
-  point1:true,
-  point2:true
+import { ref, reactive, onBeforeMount } from 'vue'
+import { queryCellular,updateCellular } from '@/api/setting';
+import { ElMessage } from 'element-plus'
+const state =reactive({
+  form1:{
+    apn:'',
+    interfac:'',
+    apnPoint:true,
+    interfaceBtn:true,
+  },
+  form2:{
+    apn:'',
+    interfac:'',
+    apnPoint:true,
+    interfaceBtn:true,
+  },
+  form1backup:{},
+  form2backup:{}
 })
-const rules = reactive({
-  name1: [
-    { required: true, message: '请输入接口名称', trigger: 'blur' },
-  ],
-  name2: [
-    { required: true, message: '请输入接口名称', trigger: 'blur' },
-  ],
-  pointName1: [
-    { required: true, message: '请输入接入点名称', trigger: 'blur' },
-  ],
-  pointName2: [
-    { required: true, message: '请输入接入点名称', trigger: 'blur' },
-  ],
-})
+const initCellular=()=>{
+  queryCellular().then(res=>{
+    // console.log(res);
+    res.payload && res.payload.forEach((item,index) => {
+      let apnPoint=true,interfaceBtn=true
+      if(!item.apn) apnPoint=false
+      if(!item.interfac) interfaceBtn=false
+      state[`form${index+1}`]={...item,apnPoint,interfaceBtn}
+      state[`form${index+1}backup`]={...item,apnPoint,interfaceBtn}
+    });
+  })
+}
+const setRule=(val,msg)=>{
+  const rule={ required: true, message:`请输入${msg}`, trigger: 'blur' }
+  return val?rule:{}
+}
+const changeBtn=({val,form,key})=>{
+  if(val){
+    // state[form][key]=state[`${form}backup`][key] // 重置接口获取的数据
+  }else{
+    state[form][key]=''
+    ruleFormRef.value.clearValidate([`${form}.${key}`])
+  }
+}
 const ruleFormRef = ref()
 const submitForm = async (formEl) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log('submit!')
+      console.log('submit!',state)
+      const data=[state.form1,state.form2]
+      updateCellular(data).then(res=>{
+        ElMessage.success('保存成功')
+      })
     } else {
       console.log('error submit!', fields)
     }
   })
 }
+onBeforeMount(()=>{
+  initCellular()
+})
 </script>
 <style scoped lang="less">
 .demo-ruleForm{

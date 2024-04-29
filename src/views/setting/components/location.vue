@@ -63,9 +63,9 @@
       }">
         <el-time-picker
           v-model="form.date2"
-          placeholder="请选择时间"
+          placeholder=""
           style="width: 100%"
-          value-format="hh:mm:ss"
+          value-format="HH:mm:ss"
         />
       </el-form-item>
     </div>
@@ -79,7 +79,7 @@
 <script setup>
 import { ref, reactive, watch, onBeforeMount } from 'vue'
 import { ElMessage } from 'element-plus'
-import { updateStation,updateSysTime } from '@/api/setting'
+import { updateStation,updateSysTime,queryNTP,updateNTP } from '@/api/setting'
 import { useStationStore } from '@/stores/station'
 const typeOptions = ['自动校时', '手动校对']
 const ruleFormRef = ref()
@@ -98,24 +98,44 @@ const form = reactive({
 watch(
   () => stationStore.station,
   (val) => {
-    console.log('watch',val)
+    // console.log('watch',val)
     if(val) form.station = val
   }
 )
 const rules = reactive({
   station: [{ required: true, message: '请输入站号', trigger: 'blur' }]
 })
+const initNTP=()=>{
+  queryNTP().then(res=>{
+    // console.log('initNTP:',res);
+    res.payload && res.payload.forEach((item,index) => {
+      form[`ntp${index+1}`]=item
+    });
+  })
+}
 const updateStationFn = () => {
   updateStation(form.station).then((res) => {
     stationStore.setStation(form.station)
-    ElMessage.success('保存站号成功')
+    ElMessage.success('保存成功')
   })
 }
 const updateTime=()=>{
   const time=`${form.date1} ${form.date2}`
   updateSysTime(time).then(res=>{
     stationStore.setTime(time)
-    ElMessage.success('保存时间成功')
+    // ElMessage.success('保存成功')
+  })
+}
+const updateNtp=()=>{
+  const address=[form.ntp1,form.ntp2,form.ntp3,form.ntp4]
+  const data={
+    stationNum:form.station,
+    address:address.filter(item=>item)
+  }
+  // console.log('updateNtp',data);
+  updateNTP(data).then(res=>{
+    stationStore.setStation(form.station)
+    ElMessage.success('保存成功')
   })
 }
 const submitForm = async (formEl) => {
@@ -123,9 +143,13 @@ const submitForm = async (formEl) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       console.log('submit!', form)
-      // updateStationFn()
       if(showTime.value){
+        updateStationFn()
         updateTime()
+      }else if(form.gps.length){
+        updateStationFn()
+      }else{
+        updateNtp()
       }
     } else {
       console.log('error submit!', fields)
@@ -156,6 +180,7 @@ watch(
 )
 onBeforeMount(()=>{
   form.station= stationStore.station
+  initNTP()
 })
 </script>
 <style scoped lang="less">

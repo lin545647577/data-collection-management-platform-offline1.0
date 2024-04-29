@@ -33,6 +33,7 @@
               placeholder="密码"
               type="password"
               show-password
+              autocomplete="new-password"
             >
               <template #prepend>
                 <svg class="svg-inp">
@@ -84,7 +85,6 @@ const submitForm = async (formEl) => {
       loading.value=true
       try {
         const res = await login(ruleForm)
-        console.log(res.payload);
         setAuthToken(res.payload)
         loading.value=false
         router.push('/')
