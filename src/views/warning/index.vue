@@ -4,19 +4,17 @@
       <div class="title">预警类型</div>
       <div class="my-select">
         <el-select
-          v-model="searchData.type"
+          v-model="searchData.alertType"
           placeholder="请选择"
         >
-          <el-option
-            label="全部预警"
-            value=" "
-          />
+        <el-option label="全部预警" value=" " />
+        <el-option v-for="item in ALERT_TYPE_OPTIONS" :key="item.value" :label="item.key" :value="item.value" />
         </el-select>
       </div>
       <div class="title">是否解除</div>
       <div class="my-select">
         <el-select
-          v-model="searchData.solve"
+          v-model="searchData.completed"
           placeholder="请选择"
         >
           <el-option
@@ -25,11 +23,11 @@
           />
           <el-option
             label="是"
-            :value="1"
+            :value="true"
           />
           <el-option
             label="否"
-            :value="0"
+            :value="false"
           />
         </el-select>
       </div>
@@ -48,7 +46,7 @@
         />
       </div>
       <div class="my-input">
-        <el-input style="width: 100%;" v-model="searchData.input" placeholder="搜索关键字" />
+        <el-input style="width: 100%;" v-model="searchData.keyword" placeholder="搜索关键字" />
       </div>
       <el-button type="primary" plain @click="handleSearch">查询</el-button>
       <el-button plain @click="handleReset">重置</el-button>
@@ -60,10 +58,14 @@
       :header-cell-style="{backgroundColor: '#F5F7FA'}"
     >
       <el-table-column type="index" label="序号" width="90" />
-      <el-table-column property="address" label="预警内容" show-overflow-tooltip/>
-      <el-table-column property="name" label="预警类型" width="150" show-overflow-tooltip/>
-      <el-table-column property="date" label="预警时间" show-overflow-tooltip/>
-      <el-table-column property="date" label="预警解除时间" show-overflow-tooltip/>
+      <el-table-column property="description" label="预警内容" show-overflow-tooltip/>
+      <el-table-column property="alertType" label="预警类型" width="150" show-overflow-tooltip>
+        <template #default="scope">
+          {{ ALERT_TYPE_OBJ[scope.row.alertType] }}
+        </template>
+      </el-table-column>
+      <el-table-column property="startTime" label="预警时间" show-overflow-tooltip/>
+      <el-table-column property="endTime" label="预警解除时间" show-overflow-tooltip/>
       <!-- <el-table-column fixed="right" label="操作" width="80">
         <template #default="scope">
           <el-button link type="primary">
@@ -87,84 +89,70 @@
 </template>
 <script setup>
 import { ref, reactive,onBeforeMount } from 'vue'
+import {queryWarningList} from '@/api/warning'
 import moment from 'moment'
+const ALERT_TYPE_OPTIONS=[
+  {
+    key:'资源预警',
+    value:1
+  },
+  {
+    key:'供电预警',
+    value:2
+  },
+  {
+    key:'通讯预警',
+    value:3
+  },
+  {
+    key:'数值预警',
+    value:4
+  },
+]
+const ALERT_TYPE_OBJ={
+  1:'资源预警',
+  2:'供电预警',
+  3:'通讯预警',
+  4:'数值预警'
+}
 const tableData = reactive({
-  list:[
-    {
-      date: '2016-05-03 10:50:20',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-03 10:50:20',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-03 10:50:20',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-03 10:50:20',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-02 16:28:38',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-04 16:28:38',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-01 16:28:38',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-08 16:28:38',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-06 16:28:38',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-07 16:28:38',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-  ],
+  list:[],
   pageNum:1,
   pageSize:10,
   total:40
 })
 const searchData=reactive({
   timeRange:['',''],
-  input:'',
-  solve:' ',
-  type:' '
+  keyword:'',
+  completed:' ',
+  alertType:' '
 })
 const initList=()=>{
-  const {timeRange,input,solve,type}=searchData
+  const {timeRange,keyword,completed,alertType}=searchData
   const start=timeRange[0]?moment(timeRange[0]).format('yyyy-MM-DD HH:mm:ss'):''
   const end=timeRange[1]?moment(timeRange[1]).format('yyyy-MM-DD HH:mm:ss'):''
   const data={
-    input,
+    keyword,
     start,
     end,
-    solve,
-    type,
+    completed,
+    alertType,
     pageNum:tableData.pageNum,
     pageSize:tableData.pageSize,
   }
-  console.log('initList',data);
+  queryWarningList(data).then(res=>{
+    const data=res.payload
+    data.content.push({ // mock
+      "alertType": "1",
+      "description": "前端页面假数据",
+      "endTime": "2024-4-15 10:15:20",
+      "id": 1,
+      "startTime": "2024-4-15 9:15:20",
+      "triggerValue": "string"
+    })
+    tableData.total=data.totalPages
+    tableData.list=data.content
+  })
 }
 const handleSearch=()=>{
   console.log('searchData',searchData);
@@ -172,9 +160,9 @@ const handleSearch=()=>{
 }
 const handleReset =()=>{
   searchData.timeRange=['','']
-  searchData.input=''
-  searchData.solve=' '
-  searchData.type=' '
+  searchData.keyword=''
+  searchData.completed=' '
+  searchData.alertType=' '
   tableData.pageNum=1
   initList()
 }
