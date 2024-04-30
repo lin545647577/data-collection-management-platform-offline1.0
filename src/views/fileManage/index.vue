@@ -45,12 +45,12 @@
       <el-table-column property="name" label="大小（字节）"/>
       <el-table-column property="date" label="最后修改时间" show-overflow-tooltip/>
       <el-table-column fixed="right" label="操作" width="80">
-      <template #default="scope">
-        <el-button link type="primary" @click="handleDownload(scope.row)">
-          下载
-        </el-button>
-      </template>
-    </el-table-column>
+        <template #default="scope">
+          <el-button link type="primary" @click="handleDownload(scope.row)">
+            下载
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <div class="page-box">
       <el-pagination
@@ -177,6 +177,7 @@ onBeforeMount(()=>{
 .content-box{
   padding: 20px 24px;
   background-color: var(--vt-c-white);
+  min-height: 100%;
   :deep(.el-button){
     height: 32px;
     line-height: 32px;

@@ -1,5 +1,8 @@
 <template>
-  <div class="content-box">
+  <div>
+    configManage
+  </div>
+  <!-- <div class="content-box">
     <div class="import-box">
       <el-button type="primary" plain>导入配置文件</el-button>
     </div>
@@ -109,7 +112,7 @@
         </div>
       </el-dialog>
     </div>
-  </div>
+  </div> -->
 </template>
 <script setup>
 import { ref, reactive, onBeforeMount } from 'vue'
