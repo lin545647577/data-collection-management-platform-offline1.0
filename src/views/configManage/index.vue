@@ -8,8 +8,8 @@
       <el-table-column prop="ctime" label="创建时间"  show-overflow-tooltip/>
       <el-table-column prop="mtime" label="修改时间"  show-overflow-tooltip/>
       <el-table-column prop="activeTime" label="激活时间"  show-overflow-tooltip/>
-      <el-table-column prop="modifyBy" label="修改人"  show-overflow-tooltip/>
-      <el-table-column label="操作" width="300">
+      <el-table-column prop="modifyBy" label="修改人"  show-overflow-tooltip width="100"/>
+      <el-table-column label="操作" width="340">
         <template #default="scope">
           <el-button link type="primary" :disabled="!!scope.row.status" @click="showActivateDia(scope.row)">
             激活配置
@@ -117,9 +117,11 @@ import { ElMessage  } from 'element-plus'
 import {queryConfigList,activateConfig,downloadConfig,deleteConfig} from '@/api/config'
 const handleCurrentChange = (val) => {
   console.log(`current page: ${val}`)
+  initList()
 }
 const handleSizeChange = (val) => {
   console.log(`${val} items per page`)
+  initList()
 }
 const tableData = reactive({
   list:[],
@@ -130,18 +132,18 @@ const tableData = reactive({
 const initList=()=>{
   queryConfigList({pageNum:tableData.pageNum,pageSize:tableData.pageSize}).then(res=>{
     const data=res.payload
-    // data.content.push({
-    //   activeTime:	'2024-4-23',
-    //   createBy	:"张三",
-    //   ctime	:'2024-4-20',
-    //   filePath	:'c:npm/',
-    //   id:	999,
-    //   modifyBy	:'李四',
-    //   mtime	:'2024-4-24',
-    //   noteRecords:	'test',
-    //   status:	0,
-    //   version:	're4.1.10'
-    // })
+    data.content.push({ // mock
+      activeTime:	'2024-4-23',
+      createBy	:"张三一",
+      ctime	:'2024-4-20',
+      filePath	:'c:npm/',
+      id:	999,
+      modifyBy	:'李四二',
+      mtime	:'2024-4-24',
+      noteRecords:	'test',
+      status:	0,
+      version:	're4.1.10'
+    })
     tableData.total=data.totalPages
     tableData.list=data.content
   })
@@ -155,6 +157,7 @@ const showActivateDia = (row) => {
 }
 const handleActivate=()=>{
   activateConfig(choosedRow.value.id).then(res=>{
+    initList()
     activateDia.value=false
     ElMessage.success('激活成功')
   })
@@ -175,6 +178,7 @@ const showDeleteDia=(row)=>{
 }
 const handleDelete=()=>{
   deleteConfig(choosedRow.value.id).then(res=>{
+    initList()
     ElMessage.success('删除成功')
     deleteDia.value=false
   })
