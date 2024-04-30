@@ -76,7 +76,7 @@ const err = (err) => {
       ElMessage.error(err.message || 'Error')
       err.toDo && setTimeout(() => {
         err.toDo()
-      }, 1000);
+      }, 500);
     })()
   }
 

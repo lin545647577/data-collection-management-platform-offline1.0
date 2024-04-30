@@ -2,10 +2,9 @@
 :root {
   --vt-c-white: #ffffff;
   --vt-c-indigo: #333333;
-  --vt-c-text-light: var(--vt-c-indigo);
   --dc-theme-blue: #0070B8; /*数据采集主要蓝色色号*/
-  --color-background: var(--vt-c-white);
-  --color-text: var(--vt-c-text-light);
+  --dc-background-color: var(--vt-c-white);
+  --dc-color: var(--vt-c-indigo);
   --dc-font-size:14px;
   --el-font-size-base:14px !important;
   --el-color-primary:#0070B8 !important;
@@ -22,8 +21,8 @@
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
+  color: var(--dc-color);
+  background: var(--dc-background-color);
   transition:
     color 0.5s,
     background-color 0.5s;

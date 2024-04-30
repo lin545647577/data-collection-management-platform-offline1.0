@@ -9,7 +9,7 @@ export const useUserInfoStore = defineStore('user', () => {
   // console.log('sessionStorage:user:',sessionStorage.getItem('username'));
   const username = ref('')
   if(localStorage.getItem('username')){
-    console.log(localStorage.getItem('username'));
+    // console.log(localStorage.getItem('username'));
     username.value=localStorage.getItem('username')
   }
   const setUserInfo=(val)=>{
