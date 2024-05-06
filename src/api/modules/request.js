@@ -121,8 +121,7 @@ request.interceptors.response.use(async (response) => {
       debounce(() => {
         ElMessage.error('登录超时，请重新登录')
         setTimeout(() => {
-          // store.dispatch('user/clearLocalCache')
-          // removeUserInfo()
+          removeUserInfo()
         }, 1000)
       })()
     }else{

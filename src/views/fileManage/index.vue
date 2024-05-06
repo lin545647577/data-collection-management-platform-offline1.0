@@ -14,11 +14,11 @@
         />
       </div>
       <div class="my-input">
-        <el-input style="width: 100%;" v-model="searchData.input" placeholder="搜索关键字" />
+        <el-input style="width: 100%;" v-model="searchData.keyword" placeholder="搜索关键字" />
       </div>
       <el-button type="primary" plain @click="handleSearch">查询</el-button>
       <el-button plain @click="handleReset">重置</el-button>
-      <el-button class="btn" type="primary" :disabled="multipleSelection.length<2">批量下载</el-button>
+      <el-button class="btn" type="primary" :disabled="multipleSelection.length<2" @click="handleMulDownload">批量下载</el-button>
     </div>
     <el-table
       ref="multipleTableRef"
@@ -31,20 +31,25 @@
       <el-table-column type="index" label="序号" width="80"/>
       <el-table-column label="文件名" show-overflow-tooltip>
         <template #default="scope">
-          <div class="name-box">
+          <div :class="['name-box',scope.row.type==1?'cursor-name':'']" @click="handleClickFolder(scope.row)">
             <svg class="svg-file">
               <!-- xlink:href执行用哪一个图标,属性值务必#icon-图标名字 -->
-              <use xlink:href="#icon-file"></use>
+              <use v-if="scope.row.type==1" xlink:href="#icon-folder"></use>
+              <use v-else xlink:href="#icon-file"></use>
             </svg>
             <span>
-              {{ scope.row.address }}
+              {{ scope.row.name }}
             </span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column property="name" label="大小（字节）"/>
-      <el-table-column property="date" label="最后修改时间" show-overflow-tooltip/>
-      <el-table-column fixed="right" label="操作" width="80">
+      <el-table-column property="length" label="大小（字节）"/>
+      <el-table-column property="lastModified" label="最后修改时间" show-overflow-tooltip>
+        <template #default="scope">
+          {{ scope.row.lastModified ? moment(scope.row.lastModified).format('yyyy-MM-DD HH:mm:ss'):'' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="80">
         <template #default="scope">
           <el-button link type="primary" @click="handleDownload(scope.row)">
             下载
@@ -67,106 +72,80 @@
 </template>
 <script setup>
 import { ref, reactive, onBeforeMount } from 'vue'
+import {queryFileList,download,mulDownload} from '@/api/file'
+import { saveAs } from 'file-saver'
 import moment from 'moment'
 const tableData = reactive({
-  list:[
-    {
-      date: '2016-05-03',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-03',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-03',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-03',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-02',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-04',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-01',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-08',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-06',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-07',
-      name: 'Tim',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-  ],
+  list:[],
   pageNum:1,
   pageSize:10,
-  total:40
+  total:0
 })
 const searchData=reactive({
   timeRange:['',''],
-  input:''
+  keyword:'',
+  path:'/'
 })
 const initList=()=>{
-  const {timeRange,input}=searchData
+  const {timeRange,keyword,path}=searchData
   const start=timeRange[0]?moment(timeRange[0]).format('yyyy-MM-DD HH:mm:ss'):''
   const end=timeRange[1]?moment(timeRange[1]).format('yyyy-MM-DD HH:mm:ss'):''
   const data={
-    input,
+    keyword,
     start,
     end,
     pageNum:tableData.pageNum,
     pageSize:tableData.pageSize,
+    path
   }
-  console.log('initList',data);
+  queryFileList(data).then(res=>{
+    const tempData=res.payload;
+    tableData.list=tempData.content
+    tableData.total=tempData.total
+  })
 }
 const handleSearch=()=>{
   console.log('searchData',searchData);
   initList()
 }
+const handleClickFolder=(row)=>{
+  if(row.type==2) return
+  searchData.path=row.path
+  searchData.timeRange=['','']
+  searchData.keyword=''
+  tableData.pageNum=1
+  initList()
+}
 const handleReset =()=>{
   searchData.timeRange=['','']
-  searchData.input=''
+  searchData.keyword=''
   tableData.pageNum=1
+  searchData.path='/'
   initList()
 }
 const multipleTableRef = ref()
 const multipleSelection = ref([])
 const handleSelectionChange = (val) => {
   multipleSelection.value = val
-  console.log(multipleSelection);
+}
+const handleMulDownload=()=>{
+  const list=[]
+  multipleSelection.value.forEach(item=>list.push(item.path))
+  mulDownload(list).then(res=>{
+    saveAs(res.data, `文件压缩包.zip`)
+  })
 }
 const handleDownload=(row)=>{
-  console.log(row);
+  download(row.path).then(res=>{
+    saveAs(res.data, `${row.name}.zip`)
+  })
 }
 const handleSizeChange = (val) => {
-  console.log(`${val} items per page`)
+  // console.log(`${val} items per page`)
   initList();
 }
 const handleCurrentChange = (val) => {
-  console.log(`current page: ${val}`)
+  // console.log(`current page: ${val}`)
   initList()
 }
 onBeforeMount(()=>{
@@ -223,6 +202,9 @@ onBeforeMount(()=>{
     .el-scrollbar__thumb{
       display: none;
     }
+  }
+  .cursor-name{
+    cursor: pointer;
   }
   .name-box{
     display: flex;

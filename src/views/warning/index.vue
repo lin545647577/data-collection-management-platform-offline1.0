@@ -88,7 +88,7 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive,onBeforeMount } from 'vue'
+import { reactive,onBeforeMount } from 'vue'
 import {queryWarningList} from '@/api/warning'
 import moment from 'moment'
 const ALERT_TYPE_OPTIONS=[
