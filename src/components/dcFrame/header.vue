@@ -8,7 +8,7 @@
       </svg>
       <span>{{stationName}}</span>
     </span>
-    <span>持续运行12天2小时34分</span>
+    <!-- <span>持续运行12天2小时34分</span> -->
     <el-dropdown>
       <span class="el-dropdown-link">
         {{username}}

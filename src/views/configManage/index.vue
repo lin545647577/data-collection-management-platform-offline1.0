@@ -1,7 +1,15 @@
 <template>
   <div class="content-box">
     <div class="import-box">
-      <el-button type="primary" plain>导入配置文件</el-button>
+      <el-upload
+        class="upload-demo"
+        action=""
+        :http-request="handleUpload"
+        :before-upload="checkFile"
+        :show-file-list="false"
+      >
+        <el-button type="primary">导入配置文件</el-button>
+      </el-upload>
     </div>
     <el-table :data="tableData.list" :header-cell-style="{backgroundColor: '#F5F7FA'}">
       <el-table-column prop="version" label="配置文件"  show-overflow-tooltip/>
@@ -15,7 +23,7 @@
             激活配置
           </el-button>
           <el-button link type="primary" @click="showRemark(scope.row)">查看备注</el-button>
-          <el-button link type="primary" :disabled="!!scope.row.status" @click="handleDownload(scope.row.id)">下载</el-button>
+          <el-button link type="primary" @click="handleDownload(scope.row)">下载</el-button>
           <el-button link type="danger" :disabled="!!scope.row.status" @click="showDeleteDia(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -114,13 +122,32 @@
 <script setup>
 import { ref, reactive, onBeforeMount } from 'vue'
 import { ElMessage  } from 'element-plus'
-import {queryConfigList,activateConfig,downloadConfig,deleteConfig} from '@/api/config'
+import {queryConfigList,activateConfig,downloadConfig,deleteConfig,uploadConfig} from '@/api/config'
+import { saveAs } from 'file-saver'
+
+const checkFile=(file)=>{
+  const name = file.name.split('.')[1]
+  if(!['conf'].includes(name)) {
+    ElMessage.warning('请上传.conf配置文件');
+    return false
+  }
+  return true
+}
+const handleUpload=(file)=>{
+  const tempData=new FormData()
+  tempData.append('file', file.file)
+  uploadConfig(tempData).then(res=>{
+    ElMessage.success('导入成功')
+    initList()
+  })
+}
+
 const handleCurrentChange = (val) => {
-  console.log(`current page: ${val}`)
+  // console.log(`current page: ${val}`)
   initList()
 }
 const handleSizeChange = (val) => {
-  console.log(`${val} items per page`)
+  // console.log(`${val} items per page`)
   initList()
 }
 const tableData = reactive({
@@ -132,18 +159,6 @@ const tableData = reactive({
 const initList=()=>{
   queryConfigList({pageNum:tableData.pageNum,pageSize:tableData.pageSize}).then(res=>{
     const data=res.payload
-    data.content.push({ // mock
-      activeTime:	'2024-4-23',
-      createBy	:"张三一",
-      ctime	:'2024-4-20',
-      filePath	:'c:npm/',
-      id:	999,
-      modifyBy	:'李四二',
-      mtime	:'2024-4-24',
-      noteRecords:	'test',
-      status:	0,
-      version:	're4.1.10'
-    })
     tableData.total=data.totalPages
     tableData.list=data.content
   })
@@ -184,9 +199,9 @@ const handleDelete=()=>{
   })
 }
 // 下载
-const handleDownload=(id)=>{
-  downloadConfig(id).then(res=>{
-    // console.log('handleDownload',res);
+const handleDownload=(row)=>{
+  downloadConfig(row.id).then(res=>{
+    saveAs(res.data,`${row.version}.conf`)
     ElMessage.success('下载成功')
   })
 }

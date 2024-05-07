@@ -133,11 +133,13 @@ const handleMulDownload=()=>{
   multipleSelection.value.forEach(item=>list.push(item.path))
   mulDownload(list).then(res=>{
     saveAs(res.data, `文件压缩包.zip`)
+    ElMessage.success('下载成功')
   })
 }
 const handleDownload=(row)=>{
   download(row.path).then(res=>{
     saveAs(res.data, `${row.name}.zip`)
+    ElMessage.success('下载成功')
   })
 }
 const handleSizeChange = (val) => {

@@ -33,6 +33,7 @@ export function downloadConfig (id) {
   return request({
     url: `${baseUrl}/download/${id}`,
     method: "post",
+    responseType: 'blob',
   });
 }
 
@@ -44,5 +45,19 @@ export function deleteConfig (id) {
   return request({
     url: `${baseUrl}/${id}`,
     method: "delete",
+  });
+}
+
+/**
+ * 导入配置文件
+ * @param {Object} data  
+ */
+export function uploadConfig (data) {
+  return request({
+    url: `${baseUrl}/upload`,
+    method: "post",
+    params:{activate:false},
+    data,
+    responseType: 'blob',
   });
 }
