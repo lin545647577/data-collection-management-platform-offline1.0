@@ -65,7 +65,7 @@
         </div>
         <template #footer>
           <div class="dialog-footer">
-            <el-button @click="activateDia = false">取消</el-button>
+            <el-button @click="deleteDia = false">取消</el-button>
             <el-button type="primary" @click="handleDelete">
               确定
             </el-button>
@@ -231,6 +231,10 @@ onBeforeMount(()=>{
     }
     .el-button.is-link.is-disabled{
       color:#999999 ;
+    }
+    tr{
+      height: 40px;
+      min-height: 40px;
     }
   }
   .page-box{

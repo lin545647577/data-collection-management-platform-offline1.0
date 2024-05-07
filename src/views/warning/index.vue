@@ -142,14 +142,14 @@ const initList=()=>{
   }
   queryWarningList(data).then(res=>{
     const data=res.payload
-    data.content.push({ // mock
-      "alertType": "1",
-      "description": "前端页面假数据",
-      "endTime": "2024-4-15 10:15:20",
-      "id": 1,
-      "startTime": "2024-4-15 9:15:20",
-      "triggerValue": "string"
-    })
+    // data.content.push({ // mock
+    //   "alertType": "1",
+    //   "description": "前端页面假数据",
+    //   "endTime": "2024-4-15 10:15:20",
+    //   "id": 1,
+    //   "startTime": "2024-4-15 9:15:20",
+    //   "triggerValue": "string"
+    // })
     tableData.total=data.totalPages
     tableData.list=data.content
   })
@@ -229,6 +229,10 @@ onBeforeMount(()=>{
     }
     .el-scrollbar__thumb{
       display: none;
+    }
+    tr{
+      height: 40px;
+      min-height: 40px;
     }
   }
   .page-box{

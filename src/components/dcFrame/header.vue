@@ -1,31 +1,41 @@
 <template>
   <div class="head-box">
-    <span>{{ sysTime }}</span>
-    <span>
-      <svg class="svg-header">
-        <!-- xlink:href执行用哪一个图标,属性值务必#icon-图标名字 -->
-        <use xlink:href="#icon-header"></use>
-      </svg>
-      <span>{{stationName}}</span>
-    </span>
-    <!-- <span>持续运行12天2小时34分</span> -->
-    <el-dropdown>
-      <span class="el-dropdown-link">
-        {{username}}
-        <el-icon class="el-icon--right">
-          <arrow-down />
-        </el-icon>
+    <div class="file-menu">
+      <el-breadcrumb :separator-icon="ArrowRight">
+        <el-breadcrumb-item>文件下载</el-breadcrumb-item>
+        <el-breadcrumb-item>promotion management</el-breadcrumb-item>
+        <el-breadcrumb-item>promotion list</el-breadcrumb-item>
+        <el-breadcrumb-item>promotion detail</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
+    <div class="info-box">
+      <span>{{ sysTime }}</span>
+      <span>
+        <svg class="svg-header">
+          <!-- xlink:href执行用哪一个图标,属性值务必#icon-图标名字 -->
+          <use xlink:href="#icon-header"></use>
+        </svg>
+        <span>{{stationName}}</span>
       </span>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item :disabled="isDisabled" class="btn-menu" @click="handleLogout">退出</el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
+      <!-- <span>持续运行12天2小时34分</span> -->
+      <el-dropdown>
+        <span class="el-dropdown-link">
+          {{username}}
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item :disabled="isDisabled" class="btn-menu" @click="handleLogout">退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </div>
   </div>
 </template>
 <script setup>
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown,ArrowRight } from '@element-plus/icons-vue'
 import { ref,onBeforeMount, onBeforeUnmount,watch } from 'vue'
 import { logout } from '@/api/login'
 import {querySysTime,queryStation} from '@/api/setting'
@@ -90,29 +100,41 @@ onBeforeUnmount(()=>{
 </script>
 <style scoped lang="less">
 .head-box {
-  height: 56px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  font-size: 14px;
-  > span {
-    margin-right: 24px;
+  height: 56px;
+  .file-menu{
+    :deep(.el-breadcrumb){
+      font-size: var(--dc-font-size);
+    }
   }
-  && * {
-    vertical-align: middle;
-  }
-  .svg-header {
-    margin-right: 8px;
-    width: 20px;
-    height: 20px;
-  }
-  .el-dropdown-link {
-    cursor: pointer;
+  .info-box{
+    font-size: var(--dc-font-size);
     display: flex;
+    justify-content: flex-end;
     align-items: center;
-    outline: none;
-    font-size: 14px;
-    line-height: normal;
+    
+    > span {
+      margin-right: 24px;
+    }
+    && * {
+      vertical-align: middle;
+    }
+    
+    .svg-header {
+      margin-right: 8px;
+      width: 20px;
+      height: 20px;
+    }
+    .el-dropdown-link {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      outline: none;
+      font-size: 14px;
+      line-height: normal;
+    }
   }
 }
 </style>
