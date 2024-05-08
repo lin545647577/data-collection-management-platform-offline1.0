@@ -1,11 +1,9 @@
 <template>
   <div class="head-box">
     <div class="file-menu">
-      <el-breadcrumb :separator-icon="ArrowRight">
-        <el-breadcrumb-item>文件下载</el-breadcrumb-item>
-        <el-breadcrumb-item>promotion management</el-breadcrumb-item>
-        <el-breadcrumb-item>promotion list</el-breadcrumb-item>
-        <el-breadcrumb-item>promotion detail</el-breadcrumb-item>
+      <el-breadcrumb :separator-icon="ArrowRight" v-if="fileManageStore.showCrumb">
+        <el-breadcrumb-item @click="handleClickFile('/',0)"><span :style="{'cursor': fileManageStore.crumbList.length?'pointer':'default'}">文件下载</span></el-breadcrumb-item>
+        <el-breadcrumb-item v-for="(item,index) in fileManageStore.crumbList" :key="item.name" @click="handleClickFile(item.path,index+1)"><span :style="{'cursor': fileManageStore.crumbList.length==(index+1)?'default':'pointer'}">{{ item.name }}</span></el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="info-box">
@@ -42,11 +40,14 @@ import {querySysTime,queryStation} from '@/api/setting'
 import { removeAuthToken } from '@/cookie/auth'
 import { useRouter } from 'vue-router'
 import moment from 'moment'
+import {useFileManageStore} from '@/stores/fileManage'
+const fileManageStore=useFileManageStore();
 import { useUserInfoStore } from '@/stores/user'
 const {username} = useUserInfoStore()
 import { useStationStore } from '@/stores/station'
 const stationStore =useStationStore()
 const router = useRouter()
+import eventBus from '@/utils/bus'
 const isDisabled=ref(false);
 const handleLogout = async() => {
   isDisabled.value=true;
@@ -88,7 +89,12 @@ watch(
     sysTime.value=time
   }
 )
-
+const handleClickFile=(path,index)=>{
+  if(!fileManageStore.crumbList.length || fileManageStore.crumbList.length==index) return
+  
+  fileManageStore.delCrumbItem(index)
+  eventBus.emit('backFile',path)
+}
 onBeforeMount(()=>{
   getTime();
   queryStationName();

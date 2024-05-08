@@ -71,10 +71,14 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onBeforeMount } from 'vue'
+import { ref, reactive, onBeforeMount, onBeforeUnmount } from 'vue'
 import {queryFileList,download,mulDownload} from '@/api/file'
 import { saveAs } from 'file-saver'
 import moment from 'moment'
+import { useFileManageStore } from '@/stores/fileManage'
+const {setShowCrumb,addCrumbList,delCrumbItem} =useFileManageStore()
+import eventBus from '@/utils/bus'
+
 const tableData = reactive({
   list:[],
   pageNum:1,
@@ -86,6 +90,9 @@ const searchData=reactive({
   keyword:'',
   path:'/'
 })
+const ttt=(val)=>{
+  console.log(val);
+}
 const initList=()=>{
   const {timeRange,keyword,path}=searchData
   const start=timeRange[0]?moment(timeRange[0]).format('yyyy-MM-DD HH:mm:ss'):''
@@ -105,7 +112,7 @@ const initList=()=>{
   })
 }
 const handleSearch=()=>{
-  console.log('searchData',searchData);
+  // console.log('searchData',searchData);
   initList()
 }
 const handleClickFolder=(row)=>{
@@ -114,13 +121,15 @@ const handleClickFolder=(row)=>{
   searchData.timeRange=['','']
   searchData.keyword=''
   tableData.pageNum=1
+  addCrumbList({path:row.path,name:row.name})
   initList()
 }
 const handleReset =()=>{
   searchData.timeRange=['','']
   searchData.keyword=''
   tableData.pageNum=1
-  searchData.path='/'
+  // searchData.path='/'
+  // delCrumbItem()
   initList()
 }
 const multipleTableRef = ref()
@@ -143,15 +152,23 @@ const handleDownload=(row)=>{
   })
 }
 const handleSizeChange = (val) => {
-  // console.log(`${val} items per page`)
   initList();
 }
 const handleCurrentChange = (val) => {
-  // console.log(`current page: ${val}`)
   initList()
 }
+eventBus.on('backFile',(path)=>{
+  console.log(path);
+  searchData.path=path
+  handleReset()
+})
 onBeforeMount(()=>{
+  setShowCrumb(true)
   initList()
+})
+onBeforeUnmount(()=>{
+  setShowCrumb(false)
+  delCrumbItem()
 })
 </script>
 <style scoped lang="less">
