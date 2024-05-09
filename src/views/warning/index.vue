@@ -119,7 +119,7 @@ const tableData = reactive({
   list:[],
   pageNum:1,
   pageSize:10,
-  total:40
+  total:0
 })
 const searchData=reactive({
   timeRange:['',''],

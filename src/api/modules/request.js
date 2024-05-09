@@ -95,6 +95,12 @@ request.interceptors.request.use(async (config) => {
   if (getAuthToken()) {
     config.headers.Authorization = `Bearer ${getAuthToken()}` ;
   }
+  if (config.method === 'get' && config.params) {
+    // 对查询参数进行 URL 编码
+    const encodedParams = new URLSearchParams(config.params);
+    // 将编码后的查询参数赋值给原先的params
+    config.params = encodedParams;
+  }
   return config
 }, err)
 

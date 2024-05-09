@@ -161,6 +161,7 @@ const initList=()=>{
     const data=res.payload
     tableData.total=data.totalPages
     tableData.list=data.content
+    tableData.total=data.total
   })
 }
 const choosedRow=ref({})
