@@ -110,15 +110,19 @@
           />
         </div>
       </div>
-      <el-radio-group v-model="searchData.radioTime" @change="changeRadio">
-        <el-radio :value="1">近一小时</el-radio>
-        <el-radio :value="2">近两小时</el-radio>
-        <el-radio :value="3">今天</el-radio>
-        <el-radio :value="4">近一天</el-radio>
-      </el-radio-group>
-      <el-scrollbar>
-        <div v-for="(item,index) in systemInfo.echartData" :key="item.elementId" :id="`elEchart${index}`" class="temperature-echart"></div>
-      </el-scrollbar>
+      <div class="radio-box">
+        <el-radio-group v-model="searchData.radioTime" @change="changeRadio">
+          <el-radio :value="1">近一小时</el-radio>
+          <el-radio :value="2">近两小时</el-radio>
+          <el-radio :value="3">今天</el-radio>
+          <el-radio :value="4">近一天</el-radio>
+        </el-radio-group>
+      </div>
+      <div class="echart-box">
+        <el-scrollbar>
+          <div v-for="(item,index) in systemInfo.echartData" :key="item.elementId" :id="`elEchart${index}`" class="temperature-echart"></div>
+        </el-scrollbar>
+      </div>
     </div>
     <el-dialog v-model="elementShow" title="自定义要素展示" center @before-colse="handleCloseEle">
       <div class="dia-box">
@@ -354,6 +358,33 @@ const drawEacht=(eOption,index)=>{
   echarts.dispose(document.getElementById(`elEchart${index}`)) // 卸载已有的图表，以免重复init报错
   const temEchart=echarts.init(document.getElementById(`elEchart${index}`))
   const option = {
+    title:{
+      text:eOption.name,
+      left:'center',
+      textStyle:{
+        color:"#333333",
+        fontWeight : 'bolder',
+        fontSize : 14,
+      }
+    },
+    tooltip: {
+      trigger: 'axis',
+      formatter: '{b}:{c} ',
+      padding:[6,12],
+      textStyle:{
+        color:'#646566',
+        fontSize:12
+      },
+      axisPointer: {
+        type: 'cross'
+      }
+    },
+    grid:{
+      left: '6%' ,
+      top: '20%' ,
+      right: '5%' ,
+      bottom: '15%' ,
+    },
     xAxis: {
       type: 'category',
       data: eOption.timeList
@@ -508,7 +539,7 @@ onBeforeUnmount(()=>{
           line-height: 25px;
         }
         .el-scrollbar{
-          height: 299px
+          height: 300px
         }
       }
       .status-box{
@@ -557,6 +588,10 @@ onBeforeUnmount(()=>{
     height: 100%;
     background-color: var(--vt-c-white);
     padding: 20px;
+    padding-bottom: 10px;
+    .radio-box{
+      margin-bottom: 12px;
+    }
     .search{
       display: flex;
       align-items: center;
@@ -572,13 +607,15 @@ onBeforeUnmount(()=>{
         }
       }
     }
-    .temperature-echart{
-      width:100% ;
-      height:220px ;
-      margin: 0 auto;
-    }
-    :deep(.el-scrollbar){
-      height: 416px;
+    .echart-box{
+      :deep(.el-scrollbar){
+        height: 420px;
+      }
+      .temperature-echart{
+        width:100% ;
+        height:220px ;
+        margin: 0 auto;
+      }
     }
   }
   :deep(.el-dialog){
