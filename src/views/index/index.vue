@@ -369,7 +369,12 @@ const drawEacht=(eOption,index)=>{
     },
     tooltip: {
       trigger: 'axis',
-      formatter: '{b}:{c} ',
+      formatter: (arr) => {
+        const val = arr[0];
+        console.log('formatter:',val);
+        let str =`${val.marker}${val.name}<span style="margin-left:20px;display: inline-block;"></span> ${val.value}`
+        return str;
+      },
       padding:[6,12],
       textStyle:{
         color:'#646566',
@@ -567,7 +572,7 @@ onBeforeUnmount(()=>{
       }
       .msg{
         margin-top: 10px;
-        height: 120px;
+        height: 140px;
         overflow: hidden;
         overflow-y: auto;
         border: 1px solid #C9C9C9;
@@ -609,7 +614,7 @@ onBeforeUnmount(()=>{
     }
     .echart-box{
       :deep(.el-scrollbar){
-        height: 420px;
+        height: 440px;
       }
       .temperature-echart{
         width:100% ;
