@@ -7,7 +7,7 @@
       label-position="left"
     >
       <el-form-item label="WIFI模式：" prop="type">
-        <el-radio-group v-model="form.type">
+        <el-radio-group v-model="form.type" @change="handleChangeType">
           <el-radio value="ap">
             <span>
               AP
@@ -45,45 +45,52 @@
         }">
           <el-input v-model="form.name"/>
         </el-form-item>
-        <el-form-item label="WIFI密码：">
-          <el-input v-model="form.name" show-password type="password" autocomplete="new-password"/>
+        <el-form-item label="WIFI密码：" prop="password" :rules="[{required: true,message: '请输入WIFI密码',trigger: 'blur'},
+          { min: 8, message: '密码长度不能小于8', trigger: 'blur' }
+        ]">
+          <el-input v-model="form.password" show-password type="password" autocomplete="new-password"/>
         </el-form-item>
-        <el-form-item label="网关：">
-          <el-input v-model="form.name"/>
+        <el-form-item label="网关：" prop="gateway" :rules="{
+          required: true,
+          message: '请输入网关IP地址',
+          trigger: 'blur',
+        }">
+          <el-input v-model="form.gateway"/>
         </el-form-item>
         <el-form-item label="主DNS服务器：">
-          <el-input v-model="form.name"/>
+          <el-input v-model="form.preferredDns"/>
         </el-form-item>
         <el-form-item label="备DNS服务器：">
-          <el-input v-model="form.name"/>
+          <el-input v-model="form.alternateDns"/>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" class="btn" @click="submitForm(ruleFormRef)">
+        <el-form-item v-if="!wifiStation.isAPMode">
+          <el-button v-loading="saveLoading" :disabled="saveLoading" type="primary" class="btn" @click="submitForm(ruleFormRef)">
             保存
           </el-button>
         </el-form-item>
       </div>
       <div class="station-box" v-show="form.type=='station'">
         <el-form-item label="已连接WIFI：">
-          <div class="wifi-box">
+          <div class="wifi-box" v-if="wifiStation.stationInfo.ssid">
             <svg class="svg-wifi">
               <use xlink:href="#icon-wifi-active"></use>
             </svg>
             <span class="active">
-              Cloudtech_5G
+              {{wifiStation.stationInfo.ssid}}
             </span>
             <span class="status">
               加密
             </span>
           </div>
         </el-form-item>
-        <el-form-item label="可用WIFI：" class="usable">
-          <div class="wifi-box">
+        <el-form-item :label="index==0?'可用WIFI：':' '" :class="index==0?'usable':''" v-for="(item,index) in wifiStation.linkedList" :key="item.bssid">
+          <div class="wifi-box" style="cursor: pointer;" @click="handleChangeWifi(item.id)">
             <svg class="svg-wifi">
+              <!-- <use :xlink:href="setSignalIcon(item.signal)"></use> -->
               <use xlink:href="#icon-wifi-strong"></use>
             </svg>
             <span class="name">
-              Cloudtech_5G
+              {{ item.ssid }}
             </span>
             <span class="status">
               加密
@@ -91,20 +98,7 @@
           </div>
         </el-form-item>
         <el-form-item label=" ">
-          <div class="wifi-box">
-            <svg class="svg-wifi">
-              <use xlink:href="#icon-wifi-nomal"></use>
-            </svg>
-            <span class="name">
-              Cloudtech_5G
-            </span>
-            <span class="status">
-              加密
-            </span>
-          </div>
-        </el-form-item>
-        <el-form-item label=" ">
-          <span class="link-wifi" @click="centerDialogVisible=true">
+          <span class="link-wifi" @click="handleLink">
             手动连接WiFi
           </span>
         </el-form-item>
@@ -118,11 +112,23 @@
           :rules="wifiRules"
           label-width="auto"
         >
-          <el-form-item label="WIFI名称" prop="name">
-            <el-input v-model="wifiForm.name" />
+          <el-form-item label="WIFI名称" prop="ssid">
+            <el-select
+              v-model="wifiForm.ssid"
+              filterable
+              placeholder="请输入或选择WIFI名称"
+            >
+              <el-option
+                v-for="item in wifiStation.scanList"
+                @click="handleChoosed(item)"
+                :key="item.bssid"
+                :label="item.ssid"
+                :value="item.ssid"
+              />
+            </el-select>
           </el-form-item>
-          <el-form-item label="WIFI密码" prop="pwd">
-            <el-input v-model="wifiForm.pwd" show-password type="password" autocomplete="new-password"/>
+          <el-form-item label="WIFI密码" prop="passphrase">
+            <el-input v-model="wifiForm.passphrase" show-password type="password" autocomplete="new-password" placeholder="请输入WIFI密码"/>
           </el-form-item>
         </el-form>
       </div>
@@ -138,30 +144,155 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onBeforeMount } from 'vue'
+import {queryWifiLinked,queryWifiList,turnOnWifiStation,checkStationStatus,
+  checkWifiApStatus,closeWifiStation,changeWifi,closeWifiAp,turnOnWifiAp,queryAPInfo,connectWifi } from '@/api/system'
+import { ElMessage } from 'element-plus'
+const wifiStation=reactive({
+  linkedList:[],  //已连接过
+  scanList:[],     //附近可连wifi
+  stationInfo:{},  //当前wifi信息
+  isStationMode:false, //当前是否为station模式
+  isAPMode:false //当前是否为ap模式
+})
+const setSignalIcon=(val)=>{
+  let str='#icon-wifi-nomal'
+  if(val) val=Math.abs(val)
+  if(val>66){
+    str='#icon-wifi-strong'
+  }else if(val>33){
+    str='#icon-wifi-nomal'
+  }else{
+    str='#icon-wifi-weak'
+  }
+  return str
+}
+const handleChangeWifi=(id)=>{
+  changeWifi(id).then(res=>{
+    ElMessage.success('连接成功')
+    initWifiLinked()
+  })
+}
+const handleLink=()=>{
+  centerDialogVisible.value=true
+  initWifiList()
+}
+const initWifiLinked=()=>{
+  queryWifiLinked().then(res=>{
+    // console.log('initWifiInfo',res.payload);
+    wifiStation.linkedList=(res.payload||[]).filter(item=>item.disabled==1)
+    wifiStation.stationInfo=(res.payload||[]).filter(item=>item.disabled==0)[0]
+  })
+}
+const initWifiList=()=>{
+  queryWifiList().then(res=>{
+    // console.log('initWifiList',res.payload);
+    wifiStation.scanList=(res.payload||[]).filter(item=>item.bssid)
+  })
+}
+const turnOnstationWifi=()=>{
+  turnOnWifiStation().then(res=>{
+    ElMessage.success('wifi开启station模式成功')
+    wifiStation.isStationMode=true
+    checkStation()
+  })
+}
+const closeStationWifi=()=>{
+  closeWifiStation().then(res=>{
+    // console.log(res);
+    wifiStation.linkedList=[]   //重置已连接过
+    wifiStation.scanList=[]     //重置可用连接
+    wifiStation.stationInfo={}  //重置当前wifi信息
+    wifiStation.isStationMode=false
+    ElMessage.success('wifi已关闭station模式')
+  })
+}
+// 手动开启WiFi后获取当前wifi信息并初始化可用WiFilist
+const checkStation=()=>{
+  checkStationStatus().then(res=>{
+    if(res.payload && res.payload.runState){
+      initWifiLinked()
+    }
+  })
+}
+const turnOffAp=()=>{
+  closeWifiAp().then(res=>{
+    // console.log('turnOffAp',res);
+    wifiStation.isAPMode=false
+    ElMessage.success('wifi已关闭AP模式')
+  })
+}
+const initApInfo=()=>{
+  queryAPInfo().then(res=>{
+    // console.log('initApInfo',res);
+    const data=res.payload
+    form.alternateDns=data.alternateDns
+    form.gateway=data.gateway
+    form.name=data.name
+    form.password=data.password
+    form.preferredDns=data.preferredDns
+  })
+}
+const handleChangeType=(val)=>{
+  // console.log('handleChangeType',val);
+  if(val=='station' && !wifiStation.isStationMode){
+    wifiStation.isAPMode && turnOffAp()
+    turnOnstationWifi()
+  }
+}
+const initWifiType=async ()=>{
+  const apRes = await checkWifiApStatus()
+  if(apRes.payload && apRes.payload.runState){
+    form.type='ap'
+    wifiStation.isStationMode=false
+    wifiStation.isAPMode=true
+    initApInfo()
+    return
+  }
+  const stationRes= await checkStationStatus()
+  if(stationRes.payload && stationRes.payload.runState){
+    form.type='station'
+    wifiStation.isStationMode=true
+    wifiStation.isAPMode=false
+    initWifiLinked()
+  }
+}
 const centerDialogVisible=ref(false)
 const wifiFormRef=ref()
 const wifiRules={
-  name: [
-    { required: true, message: '请输入wifi名称', trigger: 'blur' },
+  ssid: [
+    { required: true, message: '请输入或选择wifi名称', trigger: 'blur' },
   ],
-  pwd: [
+  passphrase: [
     { required: true, message: '请输入wifi密码', trigger: 'blur' },
   ],
 }
 const wifiForm=reactive({
-  name:'',
-  pwd:''
+  ssid:'',
+  passphrase:'',
+  bssid:''
 })
 const handleClose=()=>{
   centerDialogVisible.value=false
   wifiForm.name='',
   wifiForm.pwd=''
+  wifiStation.scanList=[]
+}
+const handleChoosed=(item)=>{
+  // console.log('handleChoosed',item);
+  wifiForm.bssid=item.bssid
 }
 const handleConfirm= async (formEl)=>{
   await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log('wifiForm:',wifiForm);
+      // console.log('wifiForm:',wifiForm);
+      connectWifi(wifiForm).then(res=>{
+        ElMessage.success('连接成功')
+        wifiForm.bssid=''
+        wifiForm.ssid=''
+        wifiForm.passphrase=''
+        initWifiLinked()
+      })
       centerDialogVisible.value=false
     } else {
       console.log('error submit!', fields)
@@ -170,20 +301,40 @@ const handleConfirm= async (formEl)=>{
 }
 
 const form =reactive({
-  type:'ap',
+  type:'',
   name:'',
+  password:'',
+  alternateDns:'',
+  gateway:'',
+  preferredDns:''
 })
 const ruleFormRef = ref()
+const saveLoading=ref(false)
 const submitForm = async (formEl) => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
-      console.log('submit!')
+      try {
+        saveLoading.value=true
+        if(wifiStation.isStationMode) await closeStationWifi()
+        const res= await turnOnWifiAp(form)
+        // console.log('turnOnAp',res);
+        ElMessage.success('wifi开启AP模式成功')
+        saveLoading.value=false
+        wifiStation.isAPMode=true
+      } catch (error) {
+        console.log(error.message);
+        // ElMessage.success('wifi开启AP模式失败',error.message)
+        saveLoading.value=false
+      }
     } else {
       console.log('error submit!', fields)
     }
   })
 }
+onBeforeMount(()=>{
+  initWifiType()
+})
 </script>
 <style scoped lang="less">
 .content-box{
@@ -245,6 +396,11 @@ const submitForm = async (formEl) => {
           font-size: var(--dc-font-size);
         }
         .status{
+          display: inline-block;
+          font-size: var(--dc-font-size);
+          width: 45px;
+          text-align: center;
+          box-sizing: border-box;
           margin-left: 8px;
           color: #C9C9C9;
           border: 1px solid #C9C9C9;
