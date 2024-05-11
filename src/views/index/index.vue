@@ -367,11 +367,10 @@ const drawEacht=(eOption,index)=>{
         fontSize : 14,
       }
     },
-    tooltip: {
+    tooltip: {// 自定义悬浮标签tabs
       trigger: 'axis',
       formatter: (arr) => {
         const val = arr[0];
-        console.log('formatter:',val);
         let str =`${val.marker}${val.name}<span style="margin-left:20px;display: inline-block;"></span> ${val.value}`
         return str;
       },
