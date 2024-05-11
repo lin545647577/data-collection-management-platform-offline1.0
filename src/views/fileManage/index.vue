@@ -147,7 +147,7 @@ const handleMulDownload=()=>{
 }
 const handleDownload=(row)=>{
   download(row.path).then(res=>{
-    saveAs(res.data, `${row.name}.zip`)
+    saveAs(res.data,row.type==1?`${row.name}.zip`:row.name)
     ElMessage.success('下载成功')
   })
 }

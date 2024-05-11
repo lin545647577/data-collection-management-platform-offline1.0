@@ -130,7 +130,7 @@ onBeforeMount(()=>{
     }
     & .el-form-item__label{
       height: 32px;
-      width: 105px;
+      width: 110px;
       line-height: 32px;
     }
     &:last-of-type{

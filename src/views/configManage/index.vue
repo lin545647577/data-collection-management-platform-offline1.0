@@ -126,8 +126,9 @@ import {queryConfigList,activateConfig,downloadConfig,deleteConfig,uploadConfig}
 import { saveAs } from 'file-saver'
 
 const checkFile=(file)=>{
-  const name = file.name.split('.')[1]
-  if(!['conf'].includes(name)) {
+  const names = file.name.split('.')
+  // console.log(names);
+  if(!names.includes('conf')) {
     ElMessage.warning('请上传.conf配置文件');
     return false
   }

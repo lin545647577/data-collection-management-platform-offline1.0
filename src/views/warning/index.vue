@@ -129,8 +129,9 @@ const searchData=reactive({
 })
 const initList=()=>{
   const {timeRange,keyword,completed,alertType}=searchData
-  const start=timeRange[0]?moment(timeRange[0]).format('yyyy-MM-DD HH:mm:ss'):''
-  const end=timeRange[1]?moment(timeRange[1]).format('yyyy-MM-DD HH:mm:ss'):''
+  const tempTime=timeRange||['','']
+  const start=tempTime[0]?moment(tempTime[0]).format('yyyy-MM-DD HH:mm:ss'):''
+  const end=tempTime[1]?moment(tempTime[1]).format('yyyy-MM-DD HH:mm:ss'):''
   const data={
     keyword,
     start,
@@ -142,20 +143,13 @@ const initList=()=>{
   }
   queryWarningList(data).then(res=>{
     const data=res.payload
-    // data.content.push({ // mock
-    //   "alertType": "1",
-    //   "description": "前端页面假数据",
-    //   "endTime": "2024-4-15 10:15:20",
-    //   "id": 1,
-    //   "startTime": "2024-4-15 9:15:20",
-    //   "triggerValue": "string"
-    // })
-    tableData.total=data.totalPages
+    tableData.total=data.total
     tableData.list=data.content
   })
 }
 const handleSearch=()=>{
-  console.log('searchData',searchData);
+  // console.log('searchData',searchData);
+  tableData.pageNum=1
   initList()
 }
 const handleReset =()=>{
@@ -167,11 +161,11 @@ const handleReset =()=>{
   initList()
 }
 const handleSizeChange = (val) => {
-  console.log(`${val} items per page`)
+  // console.log(`${val} items per page`)
   initList();
 }
 const handleCurrentChange = (val) => {
-  console.log(`current page: ${val}`)
+  // console.log(`current page: ${val}`)
   initList()
 }
 onBeforeMount(()=>{

@@ -28,7 +28,7 @@
   import Wifi from './components/wifi.vue'
   const activeName =ref('1')
   const handleClick = (tab, event) => {
-    console.log(tab.paneName, event)
+    // console.log(tab.paneName, event)
     if(activeName!=tab.paneName){
       // 重置原页面数据
     }
