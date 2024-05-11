@@ -126,15 +126,20 @@ const updateTime=()=>{
     // ElMessage.success('保存成功')
   })
 }
+const timeSyncMethod=ref(1)
 const updateNtp=()=>{
   const address=[form.ntp1,form.ntp2,form.ntp3,form.ntp4]
+  const time=`${form.date1} ${form.date2}`
   const data={
+    dateTime:timeSyncMethod.value==2?time:'',
     stationNum:form.station,
-    address:address.filter(item=>item)
+    address:timeSyncMethod.value==1?address.filter(item=>item):'',
+    timeSyncMethod:timeSyncMethod.value
   }
   // console.log('updateNtp',data);
   updateNTP(data).then(res=>{
     stationStore.setStation(form.station)
+    timeSyncMethod.value==2 && stationStore.setTime(time)
     ElMessage.success('保存成功')
   })
 }
@@ -143,14 +148,15 @@ const submitForm = async (formEl) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       console.log('submit!', form)
-      if(showTime.value){
-        updateStationFn()
-        updateTime()
-      }else if(form.gps.length){
-        updateStationFn()
-      }else{
-        updateNtp()
-      }
+      // if(showTime.value){
+      //   updateStationFn()
+      //   updateTime()
+      // }else if(form.gps.length){
+      //   updateStationFn()
+      // }else{
+      //   updateNtp()
+      // }
+      updateNtp()
     } else {
       console.log('error submit!', fields)
     }
@@ -162,8 +168,10 @@ watch(
   (gps) => {
     if (gps.toString()) {
       showNTP.value = false
+      timeSyncMethod.value=3
     } else {
       showNTP.value = true
+      timeSyncMethod.value=1
     }
   }
 )
@@ -173,8 +181,14 @@ watch(
   (type) => {
     if (type == '自动校时') {
       showTime.value = false
+      if(showNTP.value){
+        timeSyncMethod.value=1
+      }else{
+        timeSyncMethod.value=3
+      }
     } else {
       showTime.value = true
+      timeSyncMethod.value=2
     }
   }
 )
