@@ -13,9 +13,9 @@
       <el-tab-pane label="网口设置" name="4">
         <InternetAccess/>
       </el-tab-pane>
-      <el-tab-pane label="WIFI设置" name="5">
+      <!-- <el-tab-pane label="WIFI设置" name="5">
         <Wifi :type="info.wifiMode"/>
-      </el-tab-pane>
+      </el-tab-pane> -->
     </el-tabs>
   </div>
 </template>

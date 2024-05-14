@@ -5,7 +5,7 @@
     class="demo-ruleForm"
     label-position="left"
   >
-    <div class="title">网口1({{ state.form1.name }})</div>
+    <div class="title">网口1</div>
     <div class="form-item-box">
       <el-form-item label="IP获取方式：">
         <el-radio-group v-model="state.form1.method" @change="handleChangeRadio({type:state.form1.method,key:'form1'})">
