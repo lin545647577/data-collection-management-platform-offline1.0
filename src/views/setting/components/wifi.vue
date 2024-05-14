@@ -154,7 +154,7 @@ const wifiStation=reactive({
   scanList:[],     //附近可连wifi
   stationInfo:{},  //当前wifi信息
   isStationMode:false, //当前是否为station模式
-  isAPMode:false //当前是否为ap模式
+  isAPMode:false //当前是否为ap模式 
 })
 const setSignalIcon=(val)=>{
   let str='#icon-wifi-nomal'
