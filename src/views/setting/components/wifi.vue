@@ -8,7 +8,7 @@
     >
       <el-form-item label="WIFI模式：" prop="type">
         <el-radio-group v-model="form.type" @change="handleChangeType">
-          <el-radio value="ap">
+          <el-radio :value="1">
             <span>
               AP
             </span>
@@ -23,7 +23,7 @@
               </svg>
             </el-tooltip>
           </el-radio>
-          <el-radio value="station">
+          <el-radio :value="2">
             Station
             <el-tooltip
               effect="dark"
@@ -37,7 +37,7 @@
           </el-radio>
         </el-radio-group>
       </el-form-item>
-      <div v-show="form.type=='ap'">
+      <div v-show="form.type==1">
         <el-form-item label="WIFI名称：" prop="name" :rules="{
           required: true,
           message: '请输入WIFI名称',
@@ -69,7 +69,7 @@
           </el-button>
         </el-form-item>
       </div>
-      <div class="station-box" v-show="form.type=='station'">
+      <div class="station-box" v-show="form.type==2">
         <el-form-item label="已连接WIFI：">
           <div class="wifi-box" v-if="wifiStation.stationInfo.ssid">
             <svg class="svg-wifi">
@@ -144,10 +144,11 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onBeforeMount } from 'vue'
+import { ref, reactive, onBeforeMount, watchEffect } from 'vue'
 import {queryWifiLinked,queryWifiList,turnOnWifiStation,checkStationStatus,
   checkWifiApStatus,closeWifiStation,changeWifi,closeWifiAp,turnOnWifiAp,queryAPInfo,connectWifi } from '@/api/system'
 import { ElMessage } from 'element-plus'
+const props=defineProps(['type'])
 const wifiStation=reactive({
   linkedList:[],  //已连接过
   scanList:[],     //附近可连wifi
@@ -243,7 +244,7 @@ const handleChangeType=(val)=>{
 const initWifiType=async ()=>{
   const apRes = await checkWifiApStatus()
   if(apRes.payload && apRes.payload.runState){
-    form.type='ap'
+    form.type=1
     wifiStation.isStationMode=false
     wifiStation.isAPMode=true
     initApInfo()
@@ -251,7 +252,7 @@ const initWifiType=async ()=>{
   }
   const stationRes= await checkStationStatus()
   if(stationRes.payload && stationRes.payload.runState){
-    form.type='station'
+    form.type=2
     wifiStation.isStationMode=true
     wifiStation.isAPMode=false
     initWifiLinked()
@@ -287,13 +288,17 @@ const handleConfirm= async (formEl)=>{
     if (valid) {
       // console.log('wifiForm:',wifiForm);
       connectWifi(wifiForm).then(res=>{
-        ElMessage.success('连接成功')
-        wifiForm.bssid=''
-        wifiForm.ssid=''
-        wifiForm.passphrase=''
-        initWifiLinked()
+        if(res.payload){
+          ElMessage.success('连接成功')
+          wifiForm.bssid=''
+          wifiForm.ssid=''
+          wifiForm.passphrase=''
+          initWifiLinked()
+          centerDialogVisible.value=false
+        }else{
+          ElMessage.error('密码不正确')
+        }
       })
-      centerDialogVisible.value=false
     } else {
       console.log('error submit!', fields)
     }
@@ -334,6 +339,9 @@ const submitForm = async (formEl) => {
 }
 onBeforeMount(()=>{
   initWifiType()
+})
+watchEffect(()=>{
+  form.type=props.type
 })
 </script>
 <style scoped lang="less">

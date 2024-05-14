@@ -61,16 +61,18 @@ const handleLogout = async() => {
   }
 }
 const stationName=ref('')
-const queryStationName=()=>{
+const initStationName=()=>{
   queryStation().then(res=>{
     stationName.value=res.payload
     stationStore.setStation(res.payload)
   })
 }
-
+eventBus.on('updateStationName',()=>{
+  initStationName()
+})
 const sysTime=ref('')
 let timer=null
-const getTime=()=>{
+const initTime=()=>{
   querySysTime().then(res=>{
     sysTime.value=moment(res.payload).format('yyyy-MM-DD HH:mm:ss')
     stationStore.setTime(res.payload)
@@ -78,10 +80,17 @@ const getTime=()=>{
   })
 }
 const setTimer=()=>{
+  if(timer){
+    clearInterval(timer)
+    timer=null
+  }
   timer=setInterval(() => {
     sysTime.value= moment(sysTime.value).add(1,'second').format('yyyy-MM-DD HH:mm:ss')
   }, 1000);
 }
+eventBus.on('updateTime',()=>{
+  initTime()
+})
 watch(
   [()=>stationStore.station,()=>stationStore.time],
   ([station,time])=>{
@@ -91,13 +100,12 @@ watch(
 )
 const handleClickFile=(path,index)=>{
   if(!fileManageStore.crumbList.length || fileManageStore.crumbList.length==index) return
-  
   fileManageStore.delCrumbItem(index)
   eventBus.emit('backFile',path)
 }
 onBeforeMount(()=>{
-  getTime();
-  queryStationName();
+  initTime();
+  initStationName();
 })
 onBeforeUnmount(()=>{
   clearInterval(timer)

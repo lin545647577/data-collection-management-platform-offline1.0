@@ -20,21 +20,23 @@
         <el-input v-model="state.form1.interfac" :disabled="!state.form1.interfaceBtn"/>
       </el-form-item>
     </div>
-    <div class="title">SIM2</div>
-    <div class="form-item-box">
-      <el-form-item label="指定接入点：">
-        <el-switch v-model="state.form2.apnPoint" @change="changeBtn({val:state.form2.apnPoint,form:'form2',key:'apn'})"/>
-      </el-form-item>
-      <el-form-item label="接入点名称：" prop="form2.apn" :rules="setRule(state.form2.apnPoint,'接入点名称')">
-        <el-input v-model="state.form2.apn" :disabled="!state.form2.apnPoint"/>
-      </el-form-item>
-      <el-form-item label="指定接口：">
-        <el-switch v-model="state.form2.interfaceBtn" @change="changeBtn({val:state.form2.interfaceBtn,form:'form2',key:'interfac'})"/>
-      </el-form-item>
-      <el-form-item label="接口名称：" prop="form2.interfac" :rules="setRule(state.form2.interfaceBtn,'接口名称')">
-        <el-input v-model="state.form2.interfac" :disabled="!state.form2.interfaceBtn"/>
-      </el-form-item>
-    </div>
+    <template v-if="state.form2.id">
+      <div class="title">SIM2</div>
+      <div class="form-item-box">
+        <el-form-item label="指定接入点：">
+          <el-switch v-model="state.form2.apnPoint" @change="changeBtn({val:state.form2.apnPoint,form:'form2',key:'apn'})"/>
+        </el-form-item>
+        <el-form-item label="接入点名称：" prop="form2.apn" :rules="setRule(state.form2.apnPoint,'接入点名称')">
+          <el-input v-model="state.form2.apn" :disabled="!state.form2.apnPoint"/>
+        </el-form-item>
+        <el-form-item label="指定接口：">
+          <el-switch v-model="state.form2.interfaceBtn" @change="changeBtn({val:state.form2.interfaceBtn,form:'form2',key:'interfac'})"/>
+        </el-form-item>
+        <el-form-item label="接口名称：" prop="form2.interfac" :rules="setRule(state.form2.interfaceBtn,'接口名称')">
+          <el-input v-model="state.form2.interfac" :disabled="!state.form2.interfaceBtn"/>
+        </el-form-item>
+      </div>
+    </template>
     <el-form-item>
       <el-button type="primary" class="btn" @click="submitForm(ruleFormRef)">
         保存
@@ -47,17 +49,18 @@ import { ref, reactive, onBeforeMount } from 'vue'
 import { queryCellular,updateCellular } from '@/api/setting';
 import { ElMessage } from 'element-plus'
 const state =reactive({
+  list:[],
   form1:{
     apn:'',
     interfac:'',
     apnPoint:true,
-    interfaceBtn:true,
+    interfaceBtn:true
   },
   form2:{
     apn:'',
     interfac:'',
     apnPoint:true,
-    interfaceBtn:true,
+    interfaceBtn:true
   },
   form1backup:{},
   form2backup:{}
@@ -72,6 +75,7 @@ const initCellular=()=>{
       state[`form${index+1}`]={...item,apnPoint,interfaceBtn}
       state[`form${index+1}backup`]={...item,apnPoint,interfaceBtn}
     });
+    state.list=res.payload||[]
   })
 }
 const setRule=(val,msg)=>{
@@ -80,7 +84,7 @@ const setRule=(val,msg)=>{
 }
 const changeBtn=({val,form,key})=>{
   if(val){
-    // state[form][key]=state[`${form}backup`][key] // 重置接口获取的数据
+    state[form][key]=state[`${form}backup`][key] // 重置接口获取的数据
   }else{
     state[form][key]=''
     ruleFormRef.value.clearValidate([`${form}.${key}`])
@@ -91,8 +95,8 @@ const submitForm = async (formEl) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log('submit!',state)
-      const data=[state.form1,state.form2]
+      const data=[state.form1,state.form2].filter(item=>item.id)
+      // console.log('submitForm',data);
       updateCellular(data).then(res=>{
         ElMessage.success('保存成功')
       })

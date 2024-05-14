@@ -6,33 +6,30 @@
     class="demo-ruleForm"
     label-position="left"
   >
-    <el-form-item label="低电压阈值：" prop="voltageThreshold">
+    <el-form-item label="低电压阈值：" prop="voltageThreshold1">
       <el-input v-model="state.form.voltageThreshold"/><span class="tail">伏</span>
     </el-form-item>
-    <el-form-item label="CPU阈值：" prop="cpuAlertThreshold">
+    <el-form-item label="CPU阈值：" prop="cpuAlertThreshold1">
       <el-input v-model="state.form.cpuAlertThreshold"/><span class="tail">%</span>
     </el-form-item>
-    <el-form-item label="CPU阈值时间：" prop="cpuAlertDuration">
+    <el-form-item label="CPU阈值时间：" prop="cpuAlertDuration1">
       <el-input v-model="state.form.cpuAlertDuration"/><span class="tail">秒</span>
     </el-form-item>
-    <el-form-item label="内存阈值：" prop="memAlertThreshold">
+    <el-form-item label="内存阈值：" prop="memAlertThreshold1">
       <el-input v-model="state.form.memAlertThreshold"/><span class="tail">%</span>
     </el-form-item>
-    <el-form-item label="内存阈值时间：" prop="memAlertDuration">
+    <el-form-item label="内存阈值时间：" prop="memAlertDuration1">
       <el-input v-model="state.form.memAlertDuration"/><span class="tail">秒</span>
     </el-form-item>
-    <el-form-item label="闪存阈值：" prop="diskThreshold">
+    <el-form-item label="闪存阈值：" prop="diskThreshold1">
       <el-input v-model="state.form.diskThreshold"/><span class="tail">%</span>
     </el-form-item>
-    <el-form-item label="SD卡阈值：" prop="sdCardThreshold">
+    <el-form-item label="SD卡阈值：" prop="sdCardThreshold1">
       <el-input v-model="state.form.sdCardThreshold"/><span class="tail">%</span>
     </el-form-item>
-    <el-form-item label="SIM卡1信号阈值：" prop="simSignalThreshold">
+    <el-form-item label="SIM卡信号阈值：" prop="simSignalThreshold1">
       <el-input v-model="state.form.simSignalThreshold"/>
     </el-form-item>
-    <!-- <el-form-item label="SIM卡2信号阈值：" prop="name">
-      <el-input v-model="state.form.name"/>
-    </el-form-item> -->
     <el-form-item>
       <el-button type="primary" class="btn" @click="submitForm(ruleFormRef)">
         保存
@@ -95,7 +92,8 @@ const rules = {
     { validator: validatePercent, trigger: 'blur' },
   ],
   simSignalThreshold: [
-    { required: true, message: '请输入SIM卡1信号阈值', trigger: 'blur' },
+    // { required: true, message: '请输入SIM卡1信号阈值', trigger: 'blur' },
+    { required: true, message: '请输入SIM卡信号阈值', trigger: 'blur' },
   ],
 }
 

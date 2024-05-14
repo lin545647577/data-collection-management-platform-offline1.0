@@ -56,7 +56,7 @@ export function queryThreshold () {
 }
 
 /**
- * 修改站点信息
+ * 修改阈值信息
  * @param {Object} data 
  */
 export function updateThreshold (data) {
@@ -90,14 +90,24 @@ export function updateNTPOld (address) {
 }
 
 /**
- * 修改NTP信息（新）
+ * 修改站点信息（新）
  * @param {Object} data  
  */
-export function updateNTP (data) {
+export function updateStationInfo (data) {
   return request({
     url: `${baseUrl}`,
     method: "put",
     data
+  });
+}
+
+/**
+ * 修改站点信息（新） 
+ */
+export function queryStationInfo () {
+  return request({
+    url: `${baseUrl}`,
+    method: "get",
   });
 }
 

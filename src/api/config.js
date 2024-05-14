@@ -14,6 +14,36 @@ export function queryConfigList (params) {
 }
 
 /**
+ * 查询数采模块状态
+ */
+export function queryStatus () {
+  return request({
+    url: `/app/v1/system/logger/status`,
+    method: "get",
+  });
+}
+
+/**
+ * 启动数采模块
+ */
+export function turnOn () {
+  return request({
+    url: `/app/v1/system/logger/start`,
+    method: "post",
+  });
+}
+
+/**
+ * 停止数采模块
+ */
+export function turnOff () {
+  return request({
+    url: `/app/v1/system/logger/stop`,
+    method: "post",
+  });
+}
+
+/**
  * 激活配置文件
  * @param {String} id  
  */

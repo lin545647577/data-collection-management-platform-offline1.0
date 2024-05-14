@@ -65,7 +65,7 @@ export default ({command,mode})=> {
         '@': fileURLToPath(new URL('./src', import.meta.url))
       }
     },
-    css: {
+    css: { // 自适应配置
       postcss: {
         plugins: [
           postcsspxtoviewport({

@@ -29,30 +29,32 @@
         <el-input v-model="state.form1.alternateDns" :disabled="state.form1.method==2"/>
       </el-form-item>
     </div>
-    <div class="title">网口2({{ state.form2.name }})</div>
-    <div class="form-item-box">
-      <el-form-item label="IP获取方式：">
-        <el-radio-group v-model="state.form2.method" @change="handleChangeRadio({type:state.form2.method,key:'form2'})">
-          <el-radio :value="2">自动获取</el-radio>
-          <el-radio :value="1">手动设置</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="IP地址：" prop="form2.ipAddress" :rules="setRule(state.form2.method,'IP地址')">
-        <el-input v-model="state.form2.ipAddress" :disabled="state.form2.method==2"/>
-      </el-form-item>
-      <el-form-item label="子网掩码：" prop="form2.subnetMask" :rules="setRule(state.form2.method,'子网掩码')">
-        <el-input v-model="state.form2.subnetMask" :disabled="state.form2.method==2"/>
-      </el-form-item>
-      <el-form-item label="网关：" prop="form2.gateway" :rules="setRule(state.form2.method,'网关')">
-        <el-input v-model="state.form2.gateway" :disabled="state.form2.method==2"/>
-      </el-form-item>
-      <el-form-item label="主DNS服务器：" prop="preferredDns">
-        <el-input v-model="state.form2.preferredDns" :disabled="state.form2.method==2"/>
-      </el-form-item>
-      <el-form-item label="备DNS服务器：" prop="alternateDns">
-        <el-input v-model="state.form2.alternateDns" :disabled="state.form2.method==2"/>
-      </el-form-item>
-    </div>
+    <template v-if="state.form2.id">
+      <div class="title">网口2({{ state.form2.name }})</div>
+      <div class="form-item-box">
+        <el-form-item label="IP获取方式：">
+          <el-radio-group v-model="state.form2.method" @change="handleChangeRadio({type:state.form2.method,key:'form2'})">
+            <el-radio :value="2">自动获取</el-radio>
+            <el-radio :value="1">手动设置</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="IP地址：" prop="form2.ipAddress" :rules="setRule(state.form2.method,'IP地址')">
+          <el-input v-model="state.form2.ipAddress" :disabled="state.form2.method==2"/>
+        </el-form-item>
+        <el-form-item label="子网掩码：" prop="form2.subnetMask" :rules="setRule(state.form2.method,'子网掩码')">
+          <el-input v-model="state.form2.subnetMask" :disabled="state.form2.method==2"/>
+        </el-form-item>
+        <el-form-item label="网关：" prop="form2.gateway" :rules="setRule(state.form2.method,'网关')">
+          <el-input v-model="state.form2.gateway" :disabled="state.form2.method==2"/>
+        </el-form-item>
+        <el-form-item label="主DNS服务器：" prop="preferredDns">
+          <el-input v-model="state.form2.preferredDns" :disabled="state.form2.method==2"/>
+        </el-form-item>
+        <el-form-item label="备DNS服务器：" prop="alternateDns">
+          <el-input v-model="state.form2.alternateDns" :disabled="state.form2.method==2"/>
+        </el-form-item>
+      </div>
+    </template>
     <el-form-item>
       <el-button type="primary" class="btn" @click="submitForm(ruleFormRef)">
         保存
@@ -100,7 +102,7 @@ const handleChangeRadio = (val)=>{
     state[key].subnetMask=''
     ruleFormRef.value.clearValidate()
   }else{
-    // state[key]=Object.assign({},state[`${key}backup`]) // 重置接口获取的数据
+    state[key]=Object.assign({},state[`${key}backup`]) // 重置接口获取的数据
   }
 }
 const initEthernet=()=>{
@@ -113,7 +115,7 @@ const initEthernet=()=>{
   })
 }
 const updateEthernetFn=()=>{
-  const data= [state.form1,state.form2]
+  const data= [state.form1,state.form2].filter(item=>item.id)
   // console.log('update:',data);
   updateEthernet(data).then(res=>{
     ElMessage.success('保存成功')

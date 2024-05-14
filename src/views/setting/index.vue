@@ -2,7 +2,7 @@
   <div class="content-box">
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
       <el-tab-pane label="站点设置" name="1">
-        <Location />
+        <Location :info="info"/>
       </el-tab-pane>
       <el-tab-pane label="阈值设置" name="2">
         <Threshold/>
@@ -14,18 +14,19 @@
         <InternetAccess/>
       </el-tab-pane>
       <el-tab-pane label="WIFI设置" name="5">
-        <Wifi/>
+        <Wifi :type="info.wifiMode"/>
       </el-tab-pane>
     </el-tabs>
   </div>
 </template>
 <script setup>
-  import { ref, reactive } from 'vue'
+  import { ref, reactive, onBeforeMount } from 'vue'
   import Location from './components/location.vue'
   import Threshold from './components/threshold.vue'
   import FiveG from './components/fiveG.vue';
   import InternetAccess from './components/internetAccess.vue'
   import Wifi from './components/wifi.vue'
+  import {queryStationInfo} from '@/api/setting'
   const activeName =ref('1')
   const handleClick = (tab, event) => {
     // console.log(tab.paneName, event)
@@ -33,6 +34,16 @@
       // 重置原页面数据
     }
   }
+  const info=ref({})
+  const initStationInfo=()=>{
+    queryStationInfo().then(res=>{
+      // console.log(res);
+      info.value=res.payload
+    })
+  }
+  onBeforeMount(()=>{
+    initStationInfo()
+  })
 </script>
 <style scoped lang="less">
 .content-box{

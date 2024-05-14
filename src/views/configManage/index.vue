@@ -122,7 +122,7 @@
 <script setup>
 import { ref, reactive, onBeforeMount } from 'vue'
 import { ElMessage  } from 'element-plus'
-import {queryConfigList,activateConfig,downloadConfig,deleteConfig,uploadConfig} from '@/api/config'
+import {queryConfigList,activateConfig,downloadConfig,deleteConfig,uploadConfig,queryStatus, turnOff, turnOn} from '@/api/config'
 import { saveAs } from 'file-saver'
 
 const checkFile=(file)=>{
@@ -155,7 +155,8 @@ const tableData = reactive({
   list:[],
   pageNum:1,
   pageSize:10,
-  total:0
+  total:0,
+  isRunning:false // 数据采集器是否在采集
 })
 const initList=()=>{
   queryConfigList({pageNum:tableData.pageNum,pageSize:tableData.pageSize}).then(res=>{
@@ -172,12 +173,22 @@ const showActivateDia = (row) => {
   choosedRow.value=row
   activateDia.value=true
 }
-const handleActivate=()=>{
-  activateConfig(choosedRow.value.id).then(res=>{
+const checkStatus=()=>{
+  queryStatus().then(res=>{
+    if(res.payload) tableData.isRunning=res.payload.runStatus
+  })
+}
+const handleActivate=async ()=>{
+  try {
+    await activateConfig(choosedRow.value.id)
     initList()
     activateDia.value=false
     ElMessage.success('激活成功')
-  })
+    if(tableData.isRunning) await turnOff()
+    await turnOn()
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 // 查看备注
 const remarkDia=ref(false)
@@ -216,6 +227,7 @@ const handleClose=()=>{
 }
 onBeforeMount(()=>{
   initList()
+  checkStatus()
 })
 </script>
 <style scoped lang="less">

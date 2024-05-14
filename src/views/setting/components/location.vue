@@ -79,7 +79,7 @@
 <script setup>
 import { ref, reactive, watch, onBeforeMount } from 'vue'
 import { ElMessage } from 'element-plus'
-import { updateStation,updateSysTime,queryNTP,updateNTP } from '@/api/setting'
+import { queryNTP,updateStationInfo } from '@/api/setting'
 import { useStationStore } from '@/stores/station'
 const typeOptions = ['自动校时', '手动校对']
 const ruleFormRef = ref()
@@ -113,21 +113,9 @@ const initNTP=()=>{
     });
   })
 }
-const updateStationFn = () => {
-  updateStation(form.station).then((res) => {
-    stationStore.setStation(form.station)
-    ElMessage.success('保存成功')
-  })
-}
-const updateTime=()=>{
-  const time=`${form.date1} ${form.date2}`
-  updateSysTime(time).then(res=>{
-    stationStore.setTime(time)
-    // ElMessage.success('保存成功')
-  })
-}
+import eventBus from '@/utils/bus';
 const timeSyncMethod=ref(1)
-const updateNtp=()=>{
+const updateStation=()=>{
   const address=[form.ntp1,form.ntp2,form.ntp3,form.ntp4]
   const time=`${form.date1} ${form.date2}`
   const data={
@@ -136,27 +124,19 @@ const updateNtp=()=>{
     address:timeSyncMethod.value==1?address.filter(item=>item):'',
     timeSyncMethod:timeSyncMethod.value
   }
-  // console.log('updateNtp',data);
-  updateNTP(data).then(res=>{
-    stationStore.setStation(form.station)
-    timeSyncMethod.value==2 && stationStore.setTime(time)
-    ElMessage.success('保存成功')
+  updateStationInfo(data).then(res=>{
+    if(res.payload){
+      eventBus.emit('updateTime');
+      eventBus.emit('updateStationName');
+      ElMessage.success('保存成功')
+    }
   })
 }
 const submitForm = async (formEl) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log('submit!', form)
-      // if(showTime.value){
-      //   updateStationFn()
-      //   updateTime()
-      // }else if(form.gps.length){
-      //   updateStationFn()
-      // }else{
-      //   updateNtp()
-      // }
-      updateNtp()
+      updateStation()
     } else {
       console.log('error submit!', fields)
     }

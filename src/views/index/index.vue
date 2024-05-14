@@ -41,16 +41,10 @@
         <svg class="svg-sys">
           <use :xlink:href="`#icon-index-sim${index+1}`"></use>
         </svg>
-        <span>SIM{{index+1}}{{ item.cardOperator=='ChinaUnicom'?'联通':'移动' }}</span>
+        <span>SIM{{index+1}}{{ getSimCardType(item.cardOperator) }}</span>
         <span class="info-text">良好</span>
         <span class="info-tips">({{ item.signal }})</span>
       </template>
-      <!-- <svg class="svg-sys">
-        <use xlink:href="#icon-index-sim1"></use>
-      </svg>
-      <span>SIM2联通</span>
-      <span class="info-text">良好</span>
-      <span class="info-tips">(25)</span> -->
     </div>
     <div class="left-box">
       <div class="table-box">
@@ -172,6 +166,13 @@ const STATUSOBJ={
   2:{label:'异常',icon:'exception',color:'#FAAD14'}
 }
 const showType=ref(1)
+const getSimCardType=(val)=>{
+  const typeObj={
+    ChinaUnicom:'联通',
+    ChinaMobile:'移动'
+  }
+  return typeObj[val]||'电信'
+}
 const getVoltageStatus=(val)=>{
   let data={}
   if(val>75){
@@ -200,7 +201,11 @@ const getVoltageStatus=(val)=>{
       icon:'#icon-index-voltage0'
     }
   }
-  return data
+  // return data
+  return { // 假数据暂时写死
+      color:'#67C23A',
+      icon:'#icon-index-voltage100'
+    }
 }
 const searchData =reactive({
   timeRange:['',''],
@@ -234,10 +239,16 @@ const changeRadio=(val)=>{
   }
   initHistory()
 }
+const setTreeDisabled=(data)=>{
+  // console.log(data);
+  if(data.properties && !data.properties.IS_VISIBLE) return true
+  return false
+}
 const treeElement=ref()
 const treeProps={
   children: 'children',
   label: 'label',
+  disabled:setTreeDisabled
 }
 const systemInfo =reactive({
   info:{},
@@ -274,6 +285,7 @@ const initSystemInfo=()=>{
     // console.log('initSystemInfo',res.payload);
     setTimeOfDu(res.payload.systemUptime)
     systemInfo.info=res.payload
+    systemInfo.info.voltage=12.3  // 假数据暂时写死
   })
 }
 const initMessage=()=>{
@@ -290,19 +302,19 @@ const addEchartItem=(item)=>{
     valueList:[],
     timeList:[]
   })
-  console.log('addEchartItem',{
-    echartData:systemInfo.echartData,
-    echartEleIds:searchData.echartEleIds
-  });
+  // console.log('addEchartItem',{
+  //   echartData:systemInfo.echartData,
+  //   echartEleIds:searchData.echartEleIds
+  // });
 }
 const delEchartItem=(item)=>{
   const index=searchData.echartEleIds.findIndex(i=>i==item.elementId)
   searchData.echartEleIds.splice(index,1)
   systemInfo.echartData.splice(index,1)
-  console.log('delEchartItem',{
-    echartData:systemInfo.echartData,
-    echartEleIds:searchData.echartEleIds
-  });
+  // console.log('delEchartItem',{
+  //   echartData:systemInfo.echartData,
+  //   echartEleIds:searchData.echartEleIds
+  // });
 }
 const handleClickRow=(row)=>{
   // console.log('handleClickRow',row);
@@ -384,7 +396,7 @@ const drawEacht=(eOption,index)=>{
       }
     },
     grid:{
-      left: '6%' ,
+      left: '7%' ,
       top: '20%' ,
       right: '5%' ,
       bottom: '15%' ,
@@ -430,7 +442,8 @@ const initHistory=()=>{
       systemInfo.echartData.forEach(((item,index)=>drawEacht(item,index)))
       return
     }
-    const tempData=res.payload.data
+    const tempData=res.payload.data||[]
+    // console.log('systemInfo.echartData:',systemInfo.echartData);
     systemInfo.echartData.forEach((item)=>{
       item.valueList=[]
       item.timeList=[]
@@ -591,12 +604,14 @@ onBeforeUnmount(()=>{
     width: 560px;
     height: 100%;
     background-color: var(--vt-c-white);
-    padding: 20px;
-    padding-bottom: 10px;
+    // padding: 20px;
+    // padding-bottom: 10px;
     .radio-box{
-      margin-bottom: 12px;
+      margin: 0 20px 12px 20px;
     }
     .search{
+      margin: 20px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       margin-bottom:12px;
