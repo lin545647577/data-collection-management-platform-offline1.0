@@ -11,8 +11,10 @@ export const useStationStore = defineStore('station', () => {
     time.value=val
   }
   const timeOfDuration=ref('')
+  if(sessionStorage.getItem('timeOfDuration')) timeOfDuration.value=sessionStorage.getItem('timeOfDuration')
   const setTimeOfDu=(val)=>{
     timeOfDuration.value=formatDuration(val)
+    sessionStorage.setItem('timeOfDuration',formatDuration(val))
   }
   const formatDuration = (s) => {
     if (s < 0) s = -s;

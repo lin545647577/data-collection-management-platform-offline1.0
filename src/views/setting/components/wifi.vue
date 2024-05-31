@@ -180,10 +180,12 @@ const handleLink=()=>{
 }
 const initWifiLinked=()=>{
   queryWifiLinked().then(res=>{
-    // console.log('initWifiInfo',res.payload);
     const tempList=res.payload||[]
     wifiStation.linkedList=(tempList).filter(item=>item.disabled==1)
-    if(tempList.length) wifiStation.stationInfo=(tempList).filter(item=>item.disabled==0)[0]
+    if(tempList.length) {
+      wifiStation.stationInfo=(tempList).filter(item=>item.disabled==0)[0]
+      wifiStation.stationInfo.ssid=wifiStation.stationInfo.ssid.replaceAll('\"','')
+    }
   })
 }
 const initWifiList=()=>{

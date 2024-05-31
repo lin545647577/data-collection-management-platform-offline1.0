@@ -201,11 +201,7 @@ const getVoltageStatus=(val)=>{
       icon:'#icon-index-voltage0'
     }
   }
-  // return data
-  return { // 假数据暂时写死
-      color:'#67C23A',
-      icon:'#icon-index-voltage100'
-    }
+  return data
 }
 const searchData =reactive({
   timeRange:['',''],
@@ -285,7 +281,6 @@ const initSystemInfo=()=>{
     // console.log('initSystemInfo',res.payload);
     setTimeOfDu(res.payload.systemUptime)
     systemInfo.info=res.payload
-    systemInfo.info.voltage=12.3  // 假数据暂时写死
   })
 }
 const initMessage=()=>{
