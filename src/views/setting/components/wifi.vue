@@ -181,8 +181,9 @@ const handleLink=()=>{
 const initWifiLinked=()=>{
   queryWifiLinked().then(res=>{
     // console.log('initWifiInfo',res.payload);
-    wifiStation.linkedList=(res.payload||[]).filter(item=>item.disabled==1)
-    wifiStation.stationInfo=(res.payload||[]).filter(item=>item.disabled==0)[0]
+    const tempList=res.payload||[]
+    wifiStation.linkedList=(tempList).filter(item=>item.disabled==1)
+    if(tempList.length) wifiStation.stationInfo=(tempList).filter(item=>item.disabled==0)[0]
   })
 }
 const initWifiList=()=>{
@@ -234,11 +235,11 @@ const initApInfo=()=>{
     form.preferredDns=data.preferredDns
   })
 }
-const handleChangeType=(val)=>{
+const handleChangeType=async (val)=>{
   // console.log('handleChangeType',val);
   if(val==2 && !wifiStation.isStationMode){
-    wifiStation.isAPMode && turnOffAp()
-    turnOnstationWifi()
+    wifiStation.isAPMode && await turnOffAp()
+    await turnOnstationWifi()
   }
 }
 const initWifiType=async ()=>{
@@ -340,9 +341,9 @@ const submitForm = async (formEl) => {
 onBeforeMount(()=>{
   initWifiType()
 })
-watchEffect(()=>{
-  form.type=props.type
-})
+// watchEffect(()=>{
+//   form.type=props.type
+// })
 </script>
 <style scoped lang="less">
 .content-box{
