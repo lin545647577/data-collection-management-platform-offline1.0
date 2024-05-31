@@ -236,7 +236,7 @@ const initApInfo=()=>{
 }
 const handleChangeType=(val)=>{
   // console.log('handleChangeType',val);
-  if(val=='station' && !wifiStation.isStationMode){
+  if(val==2 && !wifiStation.isStationMode){
     wifiStation.isAPMode && turnOffAp()
     turnOnstationWifi()
   }
