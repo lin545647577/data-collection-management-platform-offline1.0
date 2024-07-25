@@ -124,7 +124,7 @@ import { ref, reactive, onBeforeMount } from 'vue'
 import { ElMessage  } from 'element-plus'
 import {queryConfigList,activateConfig,downloadConfig,deleteConfig,uploadConfig,queryStatus, turnOff, turnOn} from '@/api/config'
 import { saveAs } from 'file-saver'
-
+// 验证文件后缀
 const checkFile=(file)=>{
   const names = file.name.split('.')
   // console.log(names);
@@ -134,6 +134,7 @@ const checkFile=(file)=>{
   }
   return true
 }
+// 导入
 const handleUpload=(file)=>{
   const tempData=new FormData()
   tempData.append('file', file.file)
@@ -158,6 +159,7 @@ const tableData = reactive({
   total:0,
   isRunning:false // 数据采集器是否在采集
 })
+// 获取表格数据
 const initList=()=>{
   queryConfigList({pageNum:tableData.pageNum,pageSize:tableData.pageSize}).then(res=>{
     const data=res.payload
@@ -167,17 +169,19 @@ const initList=()=>{
   })
 }
 const choosedRow=ref({})
-// 激活
+
 const activateDia=ref(false)
 const showActivateDia = (row) => {
   choosedRow.value=row
   activateDia.value=true
 }
+// 激活前需查看是否已有激活配置
 const checkStatus=()=>{
   queryStatus().then(res=>{
     if(res.payload) tableData.isRunning=res.payload.runStatus
   })
 }
+// 激活
 const handleActivate=async ()=>{
   try {
     await activateConfig(choosedRow.value.id)
@@ -223,7 +227,7 @@ const handleClose=()=>{
   deleteDia.value=false
   remarkDia.value=false;
   activateDia.value=false;
-  choosedRow.value={};
+  choosedRow.value={}; // 重置
 }
 onBeforeMount(()=>{
   initList()

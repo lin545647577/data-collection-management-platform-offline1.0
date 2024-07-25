@@ -49,11 +49,12 @@ const stationStore =useStationStore()
 const router = useRouter()
 import eventBus from '@/utils/bus'
 const isDisabled=ref(false);
+// 登出注销
 const handleLogout = async() => {
   isDisabled.value=true;
   try {
     const res = await logout()
-    removeAuthToken()
+    removeAuthToken()// 清除token
     isDisabled.value=false;
     router.push('/data-collection/login')
   } catch (error) {
@@ -61,17 +62,20 @@ const handleLogout = async() => {
   }
 }
 const stationName=ref('')
+// 获取站点信息
 const initStationName=()=>{
   queryStation().then(res=>{
     stationName.value=res.payload
     stationStore.setStation(res.payload)
   })
 }
+// 站点信息变更触发刷新
 eventBus.on('updateStationName',()=>{
   initStationName()
 })
 const sysTime=ref('')
 let timer=null
+// 获取开机时间
 const initTime=()=>{
   querySysTime().then(res=>{
     sysTime.value=moment(res.payload).format('yyyy-MM-DD HH:mm:ss')
@@ -79,6 +83,7 @@ const initTime=()=>{
     setTimer()
   })
 }
+// 设置时钟效果
 const setTimer=()=>{
   if(timer){
     clearInterval(timer)
@@ -98,6 +103,7 @@ watch(
     sysTime.value=time
   }
 )
+// 文件设置模块导航
 const handleClickFile=(path,index)=>{
   if(!fileManageStore.crumbList.length || fileManageStore.crumbList.length==index) return
   fileManageStore.delCrumbItem(index)

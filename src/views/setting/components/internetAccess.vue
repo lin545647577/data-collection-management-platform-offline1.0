@@ -88,10 +88,12 @@ const state =reactive({
   form1backup:{},
   form2backup:{}
 })
+// 动态验证
 const setRule=(type,msg)=>{
   const rule={ required: true, message: `请输入${msg}`, trigger: 'blur' }
   return type==1? rule:{}
 }
+// 切换IP获取方式
 const handleChangeRadio = (val)=>{
   const {type,key}=val
   if(type==2){
@@ -105,6 +107,7 @@ const handleChangeRadio = (val)=>{
     state[key]=Object.assign({},state[`${key}backup`]) // 重置接口获取的数据
   }
 }
+// 获取ip接口详细信息
 const initEthernet=()=>{
   queryEthernet().then(res=>{
     // console.log('initEthernet:',res);
@@ -114,6 +117,7 @@ const initEthernet=()=>{
     });
   })
 }
+// 更新数据
 const updateEthernetFn=()=>{
   const data= [state.form1,state.form2].filter(item=>item.id)
   // console.log('update:',data);
@@ -122,6 +126,7 @@ const updateEthernetFn=()=>{
   })
 }
 const ruleFormRef = ref()
+// 保存
 const submitForm = async (formEl) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {

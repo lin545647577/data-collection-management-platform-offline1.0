@@ -168,16 +168,19 @@ const setSignalIcon=(val)=>{
   }
   return str
 }
+// 切换wifi模式
 const handleChangeWifi=(id)=>{
   changeWifi(id).then(res=>{
     ElMessage.success('连接成功')
     initWifiLinked()
   })
 }
+// 链接wifi
 const handleLink=()=>{
   centerDialogVisible.value=true
   initWifiList()
 }
+// 获取链接wifi对象
 const initWifiLinked=()=>{
   queryWifiLinked().then(res=>{
     const tempList=res.payload||[]
@@ -188,12 +191,14 @@ const initWifiLinked=()=>{
     }
   })
 }
+// 获取wifilieb
 const initWifiList=()=>{
   queryWifiList().then(res=>{
     // console.log('initWifiList',res.payload);
     wifiStation.scanList=(res.payload||[]).filter(item=>item.bssid)
   })
 }
+// 打开wifi模式
 const turnOnstationWifi=()=>{
   turnOnWifiStation().then(res=>{
     ElMessage.success('wifi开启station模式成功')
@@ -201,6 +206,7 @@ const turnOnstationWifi=()=>{
     checkStation()
   })
 }
+// 关闭wifi模式
 const closeStationWifi=()=>{
   closeWifiStation().then(res=>{
     // console.log(res);
@@ -208,7 +214,7 @@ const closeStationWifi=()=>{
     wifiStation.scanList=[]     //重置可用连接
     wifiStation.stationInfo={}  //重置当前wifi信息
     wifiStation.isStationMode=false
-    ElMessage.success('wifi已关闭station模式')
+    ElMessage.success('已关闭station模式')
   })
 }
 // 手动开启WiFi后获取当前wifi信息并初始化可用WiFilist
@@ -219,13 +225,15 @@ const checkStation=()=>{
     }
   })
 }
+// 关闭热点模式
 const turnOffAp=()=>{
   closeWifiAp().then(res=>{
     // console.log('turnOffAp',res);
     wifiStation.isAPMode=false
-    ElMessage.success('wifi已关闭AP模式')
+    ElMessage.success('已关闭AP模式')
   })
 }
+// 获取热点信息
 const initApInfo=()=>{
   queryAPInfo().then(res=>{
     // console.log('initApInfo',res);
@@ -237,6 +245,7 @@ const initApInfo=()=>{
     form.preferredDns=data.preferredDns
   })
 }
+// 切换热点或wifi模式
 const handleChangeType=async (val)=>{
   // console.log('handleChangeType',val);
   if(val==2 && !wifiStation.isStationMode){
@@ -244,9 +253,10 @@ const handleChangeType=async (val)=>{
     await turnOnstationWifi()
   }
 }
+// 获取数采器状态
 const initWifiType=async ()=>{
   const apRes = await checkWifiApStatus()
-  if(apRes.payload && apRes.payload.runState){
+  if(apRes.payload && apRes.payload.runState){ // 热点模式
     form.type=1
     wifiStation.isStationMode=false
     wifiStation.isAPMode=true
@@ -254,7 +264,7 @@ const initWifiType=async ()=>{
     return
   }
   const stationRes= await checkStationStatus()
-  if(stationRes.payload && stationRes.payload.runState){
+  if(stationRes.payload && stationRes.payload.runState){ //wifi模式
     form.type=2
     wifiStation.isStationMode=true
     wifiStation.isAPMode=false
@@ -276,16 +286,19 @@ const wifiForm=reactive({
   passphrase:'',
   bssid:''
 })
+// 关闭弹窗
 const handleClose=()=>{
   centerDialogVisible.value=false
   wifiForm.name='',
   wifiForm.pwd=''
   wifiStation.scanList=[]
 }
+// 选中wifi
 const handleChoosed=(item)=>{
   // console.log('handleChoosed',item);
   wifiForm.bssid=item.bssid
 }
+// 确定链接WiFi
 const handleConfirm= async (formEl)=>{
   await formEl.validate((valid, fields) => {
     if (valid) {
@@ -318,6 +331,7 @@ const form =reactive({
 })
 const ruleFormRef = ref()
 const saveLoading=ref(false)
+// 保存热点信息
 const submitForm = async (formEl) => {
   if (!formEl) return
   await formEl.validate(async (valid, fields) => {

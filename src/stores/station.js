@@ -16,6 +16,7 @@ export const useStationStore = defineStore('station', () => {
     timeOfDuration.value=formatDuration(val)
     sessionStorage.setItem('timeOfDuration',formatDuration(val))
   }
+  // 时间戳转换时间
   const formatDuration = (s) => {
     if (s < 0) s = -s;
     const time = {

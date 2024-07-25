@@ -127,6 +127,7 @@ const searchData=reactive({
   completed:' ',
   alertType:' '
 })
+// 获取表格数据
 const initList=()=>{
   const {timeRange,keyword,completed,alertType}=searchData
   const tempTime=timeRange||['','']
@@ -147,11 +148,13 @@ const initList=()=>{
     tableData.list=data.content
   })
 }
+// 查询
 const handleSearch=()=>{
   // console.log('searchData',searchData);
   tableData.pageNum=1
   initList()
 }
+// 重置
 const handleReset =()=>{
   searchData.timeRange=['','']
   searchData.keyword=''

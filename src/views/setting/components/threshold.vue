@@ -52,12 +52,14 @@ const state = reactive({form:{
   simSignalThreshold: "",
   voltageThreshold: ""
 }})
+// 获取线程数据
 const initThreshold=()=>{
   queryThreshold().then(res=>{
     // console.log(res);
     state.form=res.payload
   })
 }
+// 自定义验证
 const validatePercent = (rule, value, callback) => {
   if (value > 100 || value < 0) {
     callback(new Error('请输入正确百分比值（0-100）'))
@@ -96,7 +98,7 @@ const rules = {
     { required: true, message: '请输入SIM卡信号阈值', trigger: 'blur' },
   ],
 }
-
+// 保存
 const submitForm = async (formEl) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {

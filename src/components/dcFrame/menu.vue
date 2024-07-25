@@ -32,7 +32,7 @@
 import { ref,onBeforeMount,watch } from 'vue'
 import { useMenuStore } from '@/stores/menu';
 const menuStore=useMenuStore();
-const activeIndex = ref('/data-collection/index')
+const activeIndex = ref('/data-collection/index') // 激活标识
 const list = [
   {
     menuId: '1',

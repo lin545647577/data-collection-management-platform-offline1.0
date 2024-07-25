@@ -65,6 +65,7 @@ const state =reactive({
   form1backup:{},
   form2backup:{}
 })
+// 初始化数据
 const initCellular=()=>{
   queryCellular().then(res=>{
     // console.log(res);
@@ -78,19 +79,22 @@ const initCellular=()=>{
     state.list=res.payload||[]
   })
 }
+// 动态验证
 const setRule=(val,msg)=>{
   const rule={ required: true, message:`请输入${msg}`, trigger: 'blur' }
   return val?rule:{}
 }
+// 切换校时方式
 const changeBtn=({val,form,key})=>{
   if(val){
     state[form][key]=state[`${form}backup`][key] // 重置接口获取的数据
   }else{
     state[form][key]=''
-    ruleFormRef.value.clearValidate([`${form}.${key}`])
+    ruleFormRef.value.clearValidate([`${form}.${key}`]) // 重置验证
   }
 }
 const ruleFormRef = ref()
+// 保存修改
 const submitForm = async (formEl) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {

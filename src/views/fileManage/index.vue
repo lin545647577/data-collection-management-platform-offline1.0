@@ -90,9 +90,7 @@ const searchData=reactive({
   keyword:'',
   path:'/'
 })
-const ttt=(val)=>{
-  console.log(val);
-}
+// 获取表格list
 const initList=()=>{
   const {timeRange,keyword,path}=searchData
   const start=timeRange[0]?moment(timeRange[0]).format('yyyy-MM-DD HH:mm:ss'):''
@@ -111,19 +109,22 @@ const initList=()=>{
     tableData.total=tempData.total
   })
 }
+// 查询
 const handleSearch=()=>{
   // console.log('searchData',searchData);
   initList()
 }
+// 打开文件夹
 const handleClickFolder=(row)=>{
-  if(row.type==2) return
+  if(row.type==2) return // 文件type=2为非文件夹
   searchData.path=row.path
   searchData.timeRange=['','']
   searchData.keyword=''
   tableData.pageNum=1
-  addCrumbList({path:row.path,name:row.name})
+  addCrumbList({path:row.path,name:row.name}) // 添加导航跟踪
   initList()
 }
+// 重置
 const handleReset =()=>{
   searchData.timeRange=['','']
   searchData.keyword=''
@@ -134,9 +135,11 @@ const handleReset =()=>{
 }
 const multipleTableRef = ref()
 const multipleSelection = ref([])
+// 全选
 const handleSelectionChange = (val) => {
   multipleSelection.value = val
 }
+// 批量下载
 const handleMulDownload=()=>{
   const list=[]
   multipleSelection.value.forEach(item=>list.push(item.path))
@@ -145,6 +148,7 @@ const handleMulDownload=()=>{
     ElMessage.success('下载成功')
   })
 }
+// 单个下载
 const handleDownload=(row)=>{
   download(row.path).then(res=>{
     saveAs(res.data,row.type==1?`${row.name}.zip`:row.name)
@@ -157,6 +161,7 @@ const handleSizeChange = (val) => {
 const handleCurrentChange = (val) => {
   initList()
 }
+// 触发导航头返回
 eventBus.on('backFile',(path)=>{
   console.log(path);
   searchData.path=path

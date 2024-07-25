@@ -105,6 +105,7 @@ watch(
 const rules = reactive({
   station: [{ required: true, message: '请输入站号', trigger: 'blur' }]
 })
+// 初始化信息
 const initNTP=()=>{
   queryNTP().then(res=>{
     // console.log('initNTP:',res);
@@ -115,6 +116,7 @@ const initNTP=()=>{
 }
 import eventBus from '@/utils/bus';
 const timeSyncMethod=ref(1)
+// 修改站点信息
 const updateStation=()=>{
   const address=[form.ntp1,form.ntp2,form.ntp3,form.ntp4]
   const time=`${form.date1} ${form.date2}`
@@ -132,6 +134,7 @@ const updateStation=()=>{
     }
   })
 }
+// 保存
 const submitForm = async (formEl) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
@@ -143,7 +146,7 @@ const submitForm = async (formEl) => {
   })
 }
 const showNTP = ref(true)
-watch(
+watch(// 监听校时方式
   () => form.gps,
   (gps) => {
     if (gps.toString()) {
@@ -156,7 +159,7 @@ watch(
   }
 )
 const showTime = ref(false)
-watch(
+watch(// 监听校时方式
   () => form.type,
   (type) => {
     if (type == '自动校时') {

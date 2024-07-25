@@ -211,12 +211,14 @@ const searchData =reactive({
   elementIds:[],
   echartEleIds:[]
 })
+// 时间查询
 const changePicker=()=>{
   searchData.radioTime=0
   searchData.start=searchData.timeRange[0]
   searchData.end=searchData.timeRange[1]
   initHistory()
 }
+// 根据时间段条件查询
 const changeRadio=(val)=>{
   // console.log(val);
   searchData.timeRange=['','']
@@ -254,19 +256,21 @@ const systemInfo =reactive({
   echartData:[],
   tempMultipleSelection:[]
 })
+// 获取元素树
 const initElementTree=()=>{
   queryElements().then(res=>{
     // console.log('initElementTree:',res);
     systemInfo.elementTree=res.payload?.children||[]
   })
 }
+// 确定-展示要素
 const handleEleItem=()=>{
   // console.log(treeElement.value.getCheckedKeys(true))
   searchData.echartEleIds=[]
   systemInfo.echartData=[]
   isFirstTime.value=true
   searchData.elementIds=treeElement.value.getCheckedKeys(true)
-  initTableList()
+  initTableList() // 刷新展示列表
   elementShow.value=false
 }
 const elementShow=ref(false)
@@ -283,12 +287,14 @@ const initSystemInfo=()=>{
     systemInfo.info=res.payload
   })
 }
+// 获取报文
 const initMessage=()=>{
   queryMessage().then(res=>{
     // console.log('initMessage:',res);
     systemInfo.msg=res.payload||[]
   })
 }
+// 添加折线图item
 const addEchartItem=(item)=>{
   searchData.echartEleIds.push(item.elementId)
   systemInfo.echartData.push({
@@ -302,6 +308,7 @@ const addEchartItem=(item)=>{
   //   echartEleIds:searchData.echartEleIds
   // });
 }
+// 删除折线图item
 const delEchartItem=(item)=>{
   const index=searchData.echartEleIds.findIndex(i=>i==item.elementId)
   searchData.echartEleIds.splice(index,1)
@@ -330,6 +337,7 @@ const handleActive = (row)=>{
 }
 const isFirstTime=ref(true)
 import {debounce} from '@/utils/util'
+// 获取表格list
 const initTableList=()=>{
   queryTableData(searchData.elementIds).then(res=>{
     // console.log('initTableList',res);
@@ -348,7 +356,7 @@ const initTableList=()=>{
       if(searchData.echartEleIds.length && !isFirstTime.value){
         if(searchData.echartEleIds.includes(item.elementId)){
           item.active=true
-          debounce(()=>initHistory(),100)()
+          debounce(()=>initHistory(),100)() // 加防抖，防止查询过多
         }
       }else{
         if(index<2) {
@@ -361,6 +369,7 @@ const initTableList=()=>{
     systemInfo.list=tempList
   })
 }
+// 生成折线图
 const drawEacht=(eOption,index)=>{
   echarts.dispose(document.getElementById(`elEchart${index}`)) // 卸载已有的图表，以免重复init报错
   const temEchart=echarts.init(document.getElementById(`elEchart${index}`))
@@ -412,6 +421,7 @@ const drawEacht=(eOption,index)=>{
   };
   temEchart.setOption(option)
 }
+// 页面初始化
 const initData=()=>{
   initMessage()
   initSystemInfo()
@@ -423,6 +433,7 @@ watch(
     if(length) initHistory()
   }
 )
+// 获取折线图数据
 const initHistory=()=>{
   queryHistoryList({
     elements:searchData.echartEleIds,
@@ -439,7 +450,7 @@ const initHistory=()=>{
     }
     const tempData=res.payload.data||[]
     // console.log('systemInfo.echartData:',systemInfo.echartData);
-    systemInfo.echartData.forEach((item)=>{
+    systemInfo.echartData.forEach((item)=>{// 数据重组
       item.valueList=[]
       item.timeList=[]
       if(tempData[item.name].length){
@@ -452,7 +463,7 @@ const initHistory=()=>{
         item.timeList=[searchData.start,searchData.end]
       }
     })
-    systemInfo.echartData.forEach(((item,index)=>drawEacht(item,index)))
+    systemInfo.echartData.forEach(((item,index)=>drawEacht(item,index))) // 绘制折线图
   })
 }
 let timer=null

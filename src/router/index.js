@@ -59,7 +59,7 @@ const router = createRouter({
 //定义路由导航前置守卫
 router.beforeEach((to, from, next) => {
   Nprogress.start()
-  if(to.name=='login' && getAuthToken()){
+  if(to.name=='login' && getAuthToken()){ //非登录状态跳转登录页面
     router.push('/data-collection/index')
     return
   }

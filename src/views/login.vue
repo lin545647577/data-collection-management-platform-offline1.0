@@ -77,6 +77,7 @@ const rules = reactive({
 })
 const ruleFormRef = ref()
 const loading = ref(false)
+// 登录
 const submitForm = async (formEl) => {
   if (!formEl) return
   await formEl.validate(async (valid, fields) => {
@@ -84,10 +85,10 @@ const submitForm = async (formEl) => {
       loading.value=true
       try {
         const res = await login(ruleForm)
-        setAuthToken(res.payload)
+        setAuthToken(res.payload) // 存储token
         loading.value=false
-        setUserInfo(ruleForm.username)
-        router.push('/')
+        setUserInfo(ruleForm.username) // 存储用户信息
+        router.push('/') // 自动跳转首页
       } catch (error) {
         loading.value=false
       }
